@@ -18,9 +18,10 @@ public interface SaveTask {
     /**
      * 读取某一时间点的所有任务
      * @param date
+     * @param partition
      * @return
      */
-    Task getTask(Date date);
+    Task getTask(Date date, Integer partition);
 
     /**
      * 持久化已执行任务数据

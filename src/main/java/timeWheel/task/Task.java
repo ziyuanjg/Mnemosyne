@@ -2,7 +2,10 @@ package timeWheel.task;
 
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
+import java.io.Serializable;
 import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import timeWheel.CallBackTypeEnum;
 
@@ -10,7 +13,9 @@ import timeWheel.CallBackTypeEnum;
  * Created by 希罗 on 2018/4/25
  */
 @Data
-public class Task {
+@Builder
+@AllArgsConstructor
+public class Task implements Serializable{
 
     /**
      * 链路下级任务
@@ -51,10 +56,6 @@ public class Task {
      * 执行时间
      */
     private Date excuteTime;
-
-    public Task(){
-
-    }
 
     @Override
     public String toString() {

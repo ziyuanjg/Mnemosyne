@@ -1,65 +1,44 @@
+import com.alibaba.fastjson.JSONObject;
+import config.ConfigParamter;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import java.util.Date;
 import org.junit.Test;
+import timeWheel.CallBackTypeEnum;
+import timeWheel.task.DiskSaveTask;
+import timeWheel.task.Task;
 
 /**
  * Created by 希罗 on 2018/4/26
  */
 public class ioTest {
 
-
-
     @Test
-    public void t(){
+    public void diskSaveTask(){
 
-        thread t1 = new thread("11111111111111");
-        thread t2 = new thread("22222222222222");
-        thread t3 = new thread("33333333333333");
+        ConfigParamter.setFilePath("/Users/xiluo");
 
-        t1.start();
-        t2.start();
-        t3.start();
+        DiskSaveTask diskSaveTask = new DiskSaveTask();
 
-
-    }
-
-
-    class thread extends Thread{
-
-        private String s;
-        thread(String s){
-            this.s = s;
+        Date date = new Date();
+        Long time1 = System.currentTimeMillis();
+        for(Integer i = 0; i < 100000; i++){
+            Task task = Task.builder()
+                    .url(i.toString())
+                    .callBackType(CallBackTypeEnum.HTTP)
+                    .param(new JSONObject())
+                    .header("header")
+                    .excuteTime(date)
+                    .build();
+            diskSaveTask.saveTask(task);
         }
-        @Override
-        public void run() {
-            for(int i = 0; i<100; i++){
-                ioTest(s);
-                if(i == 99)
-                    System.out.println(i);
-            }
-        }
-    }
+        Long time2 = System.currentTimeMillis();
+        System.out.println("写入花费"+(time2 - time1)+"ms");
 
-    public void ioTest(String s){
+        Task task = diskSaveTask.getTask(date,0);
 
-        File file = new File("/Users/xiluo/test.txt");
-        if(!file.exists()){
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try(RandomAccessFile rf = new RandomAccessFile(file, "rw"); FileChannel fileChannel = rf.getChannel();) {
-
-            rf.seek(rf.length());
-            rf.write(s.getBytes());
-            rf.write("\n".getBytes());
-        } catch (Exception e){
-            System.out.println(e);
-        }
+        System.out.println("读取花费"+(System.currentTimeMillis() - time2)+"ms");
     }
 }
