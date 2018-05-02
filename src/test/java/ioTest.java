@@ -1,9 +1,5 @@
 import com.alibaba.fastjson.JSONObject;
-import config.ConfigParamter;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
+import config.SaveConfig;
 import java.util.Date;
 import org.junit.Test;
 import timeWheel.CallBackTypeEnum;
@@ -18,7 +14,7 @@ public class ioTest {
     @Test
     public void diskSaveTask(){
 
-        ConfigParamter.setFilePath("/Users/xiluo");
+        SaveConfig.setFilePath("/Users/xiluo");
 
         DiskSaveTask diskSaveTask = new DiskSaveTask();
 

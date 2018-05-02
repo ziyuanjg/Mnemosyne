@@ -3,7 +3,7 @@ package timeWheel.task;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import config.ConfigParamter;
+import config.SaveConfig;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +18,7 @@ import timeWheel.exception.TaskException;
  * 磁盘方式持久化任务
  * Created by 希罗 on 2018/4/28
  */
-public class DiskSaveTask implements SaveTask {
+public class DiskSaveTask extends AbstractSaveTask {
 
 
     /**
@@ -27,7 +27,7 @@ public class DiskSaveTask implements SaveTask {
     private final Integer getLockMaxCount = 50;
 
     @Override
-    public Boolean saveTask(Task task) {
+    public Boolean save(Task task) {
 
         if(task == null){
             return Boolean.FALSE;
@@ -41,7 +41,7 @@ public class DiskSaveTask implements SaveTask {
 
         do {
             fileName = taskDate + "." + fileNum++;
-            file = new File(ConfigParamter.getFilePath() + fileName);
+            file = new File(SaveConfig.getFilePath() + fileName);
 
         }while(file.exists() && file.length() > 1024 * 1024 * 5);
 
@@ -68,12 +68,12 @@ public class DiskSaveTask implements SaveTask {
         }catch (IOException e){
             throw new FileException(TaskException.FILE_WRITE_FAIL, e);
         }finally {
-            DiskHandler.releaseFileLock(fileName);
+            FileHandler.releaseFileLock(fileName);
         }
     }
 
     @Override
-    public Task getTask(Date date, Integer partition) {
+    public Task get(Date date, Integer partition) {
 
         if(date == null){
             throw new FileException(TaskException.PARAM_ERROR_DATE);
@@ -87,7 +87,7 @@ public class DiskSaveTask implements SaveTask {
 
         getFileLock(fileName);
 
-        File file = new File(ConfigParamter.getFilePath() + fileName);
+        File file = new File(SaveConfig.getFilePath() + fileName);
 
         if(!file.exists()){
            return null;
@@ -96,7 +96,7 @@ public class DiskSaveTask implements SaveTask {
         Task task = null;
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)))){
-            String taskString = null;
+            String taskString;
             while((taskString = br.readLine()) != null){
                 Task lastTask = JSONObject.parseObject(taskString, Task.class);
                 if(task == null){
@@ -110,14 +110,14 @@ public class DiskSaveTask implements SaveTask {
         }catch (IOException e){
             throw new FileException(TaskException.FILE_WRITE_FAIL, e);
         }finally {
-            DiskHandler.releaseFileLock(fileName);
+            FileHandler.releaseFileLock(fileName);
         }
 
         return task;
     }
 
     @Override
-    public Boolean saveFinishTask(Task task) {
+    public Boolean saveFinish(Task task) {
 
         if(task == null){
             return Boolean.FALSE;
@@ -127,7 +127,7 @@ public class DiskSaveTask implements SaveTask {
 
         getFileLock(fileName);
 
-        File file = new File(ConfigParamter.getFilePath() + fileName);
+        File file = new File(SaveConfig.getFilePath() + fileName);
 
         getTaskFromFile(task, fileName, file);
 
@@ -138,7 +138,7 @@ public class DiskSaveTask implements SaveTask {
     private void getFileLock(String fileName) {
         Integer getLockCount = 0;
 
-        while (!DiskHandler.getFileLock(fileName)){
+        while (!FileHandler.getFileLock(fileName)){
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
@@ -146,7 +146,7 @@ public class DiskSaveTask implements SaveTask {
             } finally {
                 getLockCount++;
                 if(getLockCount > getLockMaxCount){
-                    DiskHandler.releaseFileLock(fileName);
+                    FileHandler.releaseFileLock(fileName);
                     throw new FileException(TaskException.FILE_GET_LOCK_FAIL);
                 }
             }
