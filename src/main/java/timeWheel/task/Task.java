@@ -57,6 +57,11 @@ public class Task implements Serializable{
      */
     private Date excuteTime;
 
+    /**
+     * 任务创建时间
+     */
+    private Date createTime;
+
     @Override
     public String toString() {
         return "{" +

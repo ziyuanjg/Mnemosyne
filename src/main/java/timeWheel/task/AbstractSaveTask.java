@@ -1,6 +1,6 @@
 package timeWheel.task;
 
-import config.SaveConfig;
+import timeWheel.SaveConfig;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -13,14 +13,14 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractSaveTask implements SaveTask {
 
-
-    ThreadPoolExecutor pool = new ThreadPoolExecutor(SaveConfig.getCorePoolSize(), SaveConfig.getMaxPoolSize(), SaveConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    ThreadPoolExecutor savePool = new ThreadPoolExecutor(SaveConfig.getCorePoolSize(), SaveConfig.getMaxPoolSize(), SaveConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    ThreadPoolExecutor getPool = new ThreadPoolExecutor(SaveConfig.getCorePoolSize(), SaveConfig.getMaxPoolSize(), SaveConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     @Override
     public Boolean saveTask(Task task) {
 
         try {
-            Future<Boolean> future = pool.submit(() -> save(task));
+            Future<Boolean> future = savePool.submit(() -> save(task));
             return future.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -35,7 +35,7 @@ public abstract class AbstractSaveTask implements SaveTask {
     public Task getTask(Date date, Integer partition) {
 
         try {
-            Future<Task> future = pool.submit(() -> get(date, partition));
+            Future<Task> future = getPool.submit(() -> get(date, partition));
             return future.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -50,7 +50,7 @@ public abstract class AbstractSaveTask implements SaveTask {
     public Boolean saveFinishTask(Task task) {
 
         try {
-            Future<Boolean> future = pool.submit(() -> saveFinishTask(task));
+            Future<Boolean> future = savePool.submit(() -> saveFinishTask(task));
             return future.get();
         } catch (InterruptedException e) {
             e.printStackTrace();

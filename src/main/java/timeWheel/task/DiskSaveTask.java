@@ -3,7 +3,7 @@ package timeWheel.task;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import config.SaveConfig;
+import timeWheel.SaveConfig;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
