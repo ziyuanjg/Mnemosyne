@@ -1,11 +1,11 @@
 package timeWheel.exception;
 
-import common.ExceptionInterface;
+import common.EnumInterface;
 
 /**
  * Created by 希罗 on 2018/4/28
  */
-public enum TaskException implements ExceptionInterface{
+public enum TaskExceptionEnum implements EnumInterface {
 
     FILE_CREATE_FAIL(1001, "文件创建失败"),
     FILE_GET_LOCK_FAIL(1002, "获取文件锁失败"),
@@ -19,7 +19,7 @@ public enum TaskException implements ExceptionInterface{
     private Integer code;
     private String message;
 
-    TaskException(Integer code, String message) {
+    TaskExceptionEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

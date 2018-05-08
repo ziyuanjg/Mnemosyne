@@ -5,13 +5,13 @@ package common;
  */
 public class BaseException extends RuntimeException{
 
-    ExceptionInterface exceptionInterface;
+    EnumInterface exceptionInterface;
 
 
-    public BaseException(ExceptionInterface exception) {
+    public BaseException(EnumInterface exception) {
         super(exception.getCode()+":"+exception.getMessage());
     }
-    public BaseException(ExceptionInterface exception, Throwable cause) {
+    public BaseException(EnumInterface exception, Throwable cause) {
         super(exception.getCode()+":"+exception.getMessage(), cause);
     }
 }

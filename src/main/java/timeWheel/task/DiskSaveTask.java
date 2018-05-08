@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.Date;
 import timeWheel.exception.FileException;
-import timeWheel.exception.TaskException;
+import timeWheel.exception.TaskExceptionEnum;
 
 /**
  * 磁盘方式持久化任务
@@ -57,7 +57,7 @@ public class DiskSaveTask extends AbstractSaveTask {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                throw new FileException(TaskException.FILE_CREATE_FAIL, e);
+                throw new FileException(TaskExceptionEnum.FILE_CREATE_FAIL, e);
             }
         }
 
@@ -66,7 +66,7 @@ public class DiskSaveTask extends AbstractSaveTask {
             rf.write(JSON.toJSONString(task).getBytes());
             rf.write("\n".getBytes());
         }catch (IOException e){
-            throw new FileException(TaskException.FILE_WRITE_FAIL, e);
+            throw new FileException(TaskExceptionEnum.FILE_WRITE_FAIL, e);
         }finally {
             FileHandler.releaseFileLock(fileName);
         }
@@ -76,11 +76,11 @@ public class DiskSaveTask extends AbstractSaveTask {
     public Task get(Date date, Integer partition) {
 
         if(date == null){
-            throw new FileException(TaskException.PARAM_ERROR_DATE);
+            throw new FileException(TaskExceptionEnum.PARAM_ERROR_DATE);
         }
 
         if(partition == null){
-            throw new FileException(TaskException.PARAM_ERROR_PARTITION);
+            throw new FileException(TaskExceptionEnum.PARAM_ERROR_PARTITION);
         }
 
         String fileName = DateUtil.formatDateTime(date) + "." + partition;
@@ -108,7 +108,7 @@ public class DiskSaveTask extends AbstractSaveTask {
                 }
             }
         }catch (IOException e){
-            throw new FileException(TaskException.FILE_WRITE_FAIL, e);
+            throw new FileException(TaskExceptionEnum.FILE_WRITE_FAIL, e);
         }finally {
             FileHandler.releaseFileLock(fileName);
         }
@@ -147,7 +147,7 @@ public class DiskSaveTask extends AbstractSaveTask {
                 getLockCount++;
                 if(getLockCount > getLockMaxCount){
                     FileHandler.releaseFileLock(fileName);
-                    throw new FileException(TaskException.FILE_GET_LOCK_FAIL);
+                    throw new FileException(TaskExceptionEnum.FILE_GET_LOCK_FAIL);
                 }
             }
         }

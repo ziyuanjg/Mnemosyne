@@ -1,7 +1,7 @@
 package timeWheel.exception;
 
 import common.BaseException;
-import common.ExceptionInterface;
+import common.EnumInterface;
 
 /**
  * 文件操作异常
@@ -9,11 +9,11 @@ import common.ExceptionInterface;
  */
 public class FileException extends BaseException{
 
-    public FileException(ExceptionInterface exception) {
+    public FileException(EnumInterface exception) {
         super(exception);
     }
 
-    public FileException(ExceptionInterface exception, Throwable cause) {
+    public FileException(EnumInterface exception, Throwable cause) {
         super(exception, cause);
     }
 }
