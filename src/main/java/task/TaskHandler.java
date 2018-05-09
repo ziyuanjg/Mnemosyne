@@ -1,12 +1,11 @@
-package timeWheel.task;
+package task;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by 希罗 on 2018/4/28
  */
-public interface SaveTask {
+public interface TaskHandler {
 
     /**
      * 持久化任务数据
@@ -16,7 +15,7 @@ public interface SaveTask {
     Boolean saveTask(Task task);
 
     /**
-     * 读取某一时间点的所有任务
+     * 读取某一时间点的指定分区的所有任务
      * @param date
      * @param partition
      * @return
@@ -29,5 +28,12 @@ public interface SaveTask {
      * @return
      */
     Boolean saveFinishTask(Task task);
+
+    /**
+     * 读取某一时间点的任务分区数量
+     * @param date
+     * @return
+     */
+    Integer getPartitionCount(Date date);
 
 }

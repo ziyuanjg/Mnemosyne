@@ -1,10 +1,11 @@
-import com.alibaba.fastjson.JSONObject;
-import timeWheel.SaveConfig;
+import java.io.File;
+import java.util.HashMap;
+import task.SaveConfig;
 import java.util.Date;
 import org.junit.Test;
-import timeWheel.CallBackTypeEnum;
-import timeWheel.task.DiskSaveTask;
-import timeWheel.task.Task;
+import task.CallBackTypeEnum;
+import task.DiskTaskHandler;
+import task.Task;
 
 /**
  * Created by 希罗 on 2018/4/26
@@ -16,7 +17,7 @@ public class ioTest {
 
         SaveConfig.setFilePath("/Users/xiluo");
 
-        DiskSaveTask diskSaveTask = new DiskSaveTask();
+        DiskTaskHandler diskSaveTask = new DiskTaskHandler();
 
         Date date = new Date();
         Long time1 = System.currentTimeMillis();
@@ -24,8 +25,8 @@ public class ioTest {
             Task task = Task.builder()
                     .url(i.toString())
                     .callBackType(CallBackTypeEnum.HTTP)
-                    .param(new JSONObject())
-                    .header("header")
+                    .param(new HashMap<>())
+                    .header(new HashMap<>())
                     .excuteTime(date)
                     .build();
             diskSaveTask.saveTask(task);
@@ -36,5 +37,19 @@ public class ioTest {
         Task task = diskSaveTask.getTask(date,0);
 
         System.out.println("读取花费"+(System.currentTimeMillis() - time2)+"ms");
+    }
+
+@Test
+    public void ttt(){
+
+        File file = new File("/Users/xiluo/2018-01-01/012/2018-01-01 01:10:10");
+        if(!file.getParentFile().exists()){
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

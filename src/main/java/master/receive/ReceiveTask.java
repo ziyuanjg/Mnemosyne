@@ -1,6 +1,6 @@
 package master.receive;
 
-import timeWheel.task.Task;
+import task.Task;
 
 /**
  * Created by 希罗 on 2018/5/3

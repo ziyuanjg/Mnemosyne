@@ -1,9 +1,10 @@
-package timeWheel.task;
+package task;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import timeWheel.SaveConfig;
+import java.io.FilenameFilter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,28 +12,30 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.Date;
-import timeWheel.exception.FileException;
-import timeWheel.exception.TaskExceptionEnum;
+import task.exception.FileException;
+import task.exception.TaskExceptionEnum;
 
 /**
  * 磁盘方式持久化任务
  * Created by 希罗 on 2018/4/28
  */
-public class DiskSaveTask extends AbstractSaveTask {
-
+public class DiskTaskHandler extends AbstractTaskHandler {
 
     /**
      * 单次获取文件锁的最高尝试次数，避免出现一直获取不到锁，导致线程一直被持有
      */
     private final Integer getLockMaxCount = 50;
 
+    private final String FINISH_SUFFIX = "_finished";
+
     @Override
-    public Boolean save(Task task) {
+    Boolean save(Task task) {
 
         if(task == null){
             return Boolean.FALSE;
         }
 
+        DateTime excuteTime = DateUtil.date(task.getExcuteTime());
         String taskDate = DateUtil.formatDateTime(task.getExcuteTime());
 
         File file;
@@ -41,7 +44,8 @@ public class DiskSaveTask extends AbstractSaveTask {
 
         do {
             fileName = taskDate + "." + fileNum++;
-            file = new File(SaveConfig.getFilePath() + fileName);
+            String filePath = getFilePath(excuteTime);
+            file = new File(filePath + fileName);
 
         }while(file.exists() && file.length() > 1024 * 1024 * 5);
 
@@ -52,11 +56,24 @@ public class DiskSaveTask extends AbstractSaveTask {
         return Boolean.TRUE;
     }
 
+    private String getFilePath(DateTime excuteTime) {
+        return SaveConfig.getFilePath()
+                + excuteTime.year() + "/"
+                + excuteTime.month() + "/"
+                + excuteTime.dayOfMonth() + "/"
+                + excuteTime.hour(true) + "/"
+                + excuteTime.minute() + "/"
+                + excuteTime.second() + "/";
+    }
+
     private void getTaskFromFile(Task task, String fileName, File file) {
-        if(!file.exists()){
+        if(!file.getParentFile().exists()){
             try {
-                file.createNewFile();
-            } catch (IOException e) {
+                file.getParentFile().mkdirs();
+                if(!file.exists()){
+                    file.createNewFile();
+                }
+            } catch (Exception e) {
                 throw new FileException(TaskExceptionEnum.FILE_CREATE_FAIL, e);
             }
         }
@@ -73,7 +90,7 @@ public class DiskSaveTask extends AbstractSaveTask {
     }
 
     @Override
-    public Task get(Date date, Integer partition) {
+    Task get(Date date, Integer partition) {
 
         if(date == null){
             throw new FileException(TaskExceptionEnum.PARAM_ERROR_DATE);
@@ -87,7 +104,9 @@ public class DiskSaveTask extends AbstractSaveTask {
 
         getFileLock(fileName);
 
-        File file = new File(SaveConfig.getFilePath() + fileName);
+        DateTime excuteTime = DateUtil.date(date);
+        String filePath = getFilePath(excuteTime);
+        File file = new File(filePath + fileName);
 
         if(!file.exists()){
            return null;
@@ -117,23 +136,45 @@ public class DiskSaveTask extends AbstractSaveTask {
     }
 
     @Override
-    public Boolean saveFinish(Task task) {
+    Boolean saveFinish(Task task) {
 
         if(task == null){
             return Boolean.FALSE;
         }
 
-        String fileName = DateUtil.formatDateTime(task.getExcuteTime()) + "_finished";
+        String fileName = DateUtil.formatDateTime(task.getExcuteTime()) + FINISH_SUFFIX;
 
         getFileLock(fileName);
 
-        File file = new File(SaveConfig.getFilePath() + fileName);
+        DateTime excuteTime = DateUtil.date(task.getExcuteTime());
+        String filePath = getFilePath(excuteTime);
+        File file = new File(filePath + fileName);
 
         getTaskFromFile(task, fileName, file);
 
         return Boolean.TRUE;
     }
 
+    @Override
+    Integer getPartitionNum(Date date) {
+
+        DateTime excuteTime = DateUtil.date(date);
+        String filePath = getFilePath(excuteTime);
+
+        File file = new File(filePath);
+
+        if(file.isDirectory()){
+
+            return file.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return !name.contains(FINISH_SUFFIX);
+                }
+            }).length;
+        }else{
+            return 0;
+        }
+    }
 
     private void getFileLock(String fileName) {
         Integer getLockCount = 0;

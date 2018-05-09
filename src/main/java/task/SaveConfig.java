@@ -1,8 +1,7 @@
-package timeWheel;
+package task;
 
 import lombok.Builder;
 import lombok.Builder.Default;
-import timeWheel.task.SaveTypeEnum;
 
 /**
  * 持久化参数

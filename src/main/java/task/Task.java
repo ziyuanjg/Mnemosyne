@@ -1,13 +1,12 @@
-package timeWheel.task;
+package task;
 
-import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSONObject;
+import common.httpClient.RequestTypeEnum;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import timeWheel.CallBackTypeEnum;
 
 /**
  * Created by 希罗 on 2018/4/25
@@ -45,12 +44,12 @@ public class Task implements Serializable{
     /**
      * 回调参数
      */
-    private JSONObject param;
+    private Map<String, String> param;
 
     /**
      * 回调请求头
      */
-    private String header;
+    private Map<String, String> header;
 
     /**
      * 执行时间
@@ -62,14 +61,9 @@ public class Task implements Serializable{
      */
     private Date createTime;
 
-    @Override
-    public String toString() {
-        return "{" +
-                "  url='" + url + '\'' +
-                ", callBackType=" + callBackType.getCode() +
-                ", param=" + param.toString() +
-                ", header='" + header + '\'' +
-                ", excuteTime=" + DateUtil.formatDateTime(excuteTime) +
-                '}';
-    }
+    /**
+     * 请求方式
+     */
+    private RequestTypeEnum requestTypeEnum;
+
 }

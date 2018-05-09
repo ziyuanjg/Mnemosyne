@@ -16,7 +16,6 @@ import okhttp3.Response;
  */
 public class OkHTTPClient extends BaseClient{
 
-
     @Override
     String get(String url, Headers headers){
 

@@ -1,6 +1,5 @@
-package timeWheel.task;
+package task;
 
-import timeWheel.SaveConfig;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -11,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by 希罗 on 2018/5/2
  */
-public abstract class AbstractSaveTask implements SaveTask {
+public abstract class AbstractTaskHandler implements TaskHandler {
 
     ThreadPoolExecutor savePool = new ThreadPoolExecutor(SaveConfig.getCorePoolSize(), SaveConfig.getMaxPoolSize(), SaveConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     ThreadPoolExecutor getPool = new ThreadPoolExecutor(SaveConfig.getCorePoolSize(), SaveConfig.getMaxPoolSize(), SaveConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
@@ -50,7 +49,7 @@ public abstract class AbstractSaveTask implements SaveTask {
     public Boolean saveFinishTask(Task task) {
 
         try {
-            Future<Boolean> future = savePool.submit(() -> saveFinishTask(task));
+            Future<Boolean> future = savePool.submit(() -> saveFinish(task));
             return future.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -61,9 +60,16 @@ public abstract class AbstractSaveTask implements SaveTask {
         }
     }
 
-    public abstract Boolean save(Task task);
+    @Override
+    public Integer getPartitionCount(Date date) {
+        return null;
+    }
 
-    public abstract Task get(Date date, Integer partition);
+    abstract Integer getPartitionNum(Date date);
 
-    public abstract Boolean saveFinish(Task task);
+    abstract Boolean save(Task task);
+
+    abstract Task get(Date date, Integer partition);
+
+    abstract Boolean saveFinish(Task task);
 }
