@@ -5,7 +5,7 @@ import lombok.Builder.Default;
 
 /**
  * 持久化参数
- * Created by 希罗 on 2018/4/28
+ * Created by Mr.Luo on 2018/4/28
  */
 @Builder
 public class SaveConfig {

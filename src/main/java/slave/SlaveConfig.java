@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Builder.Default;
 
 /**
- * Created by 希罗 on 2018/5/9
+ * Created by Mr.Luo on 2018/5/9
  */
 @Builder
 public class SlaveConfig {

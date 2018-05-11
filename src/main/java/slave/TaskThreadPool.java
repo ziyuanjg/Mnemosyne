@@ -12,12 +12,12 @@ import task.Task;
 import task.TaskHandler;
 
 /**
- * Created by 希罗 on 2018/5/9
+ * Created by Mr.Luo on 2018/5/9
  */
 public class TaskThreadPool {
 
 
-    private static final ThreadPoolExecutor pool = new ThreadPoolExecutor(SlaveConfig.getCorePoolSize(),
+    private static final ThreadPoolExecutor executeTaskPool = new ThreadPoolExecutor(SlaveConfig.getCorePoolSize(),
             SlaveConfig.getMaxPoolSize(), SlaveConfig.getKeepAliveTime(), TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
 
@@ -28,7 +28,7 @@ public class TaskThreadPool {
         for(Integer i = 0; i < SlaveConfig.getMaxPoolSize(); i++){
 
             TaskThread taskThread = new TaskThread(taskQueue);
-            pool.execute(taskThread);
+            executeTaskPool.execute(taskThread);
         }
     }
 

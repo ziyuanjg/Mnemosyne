@@ -1,6 +1,7 @@
 package common;
 
 import common.httpClient.HTTPClient;
+import master.MasterConfig;
 import slave.SlaveConfig;
 import slave.TaskService;
 import slave.TaskThreadPool;
@@ -8,13 +9,15 @@ import task.SaveConfig;
 import task.TaskHandler;
 
 /**
- * Created by 希罗 on 2018/5/9
+ * Created by Mr.Luo on 2018/5/9
  */
 public class Configuration {
 
     private static SlaveConfig slaveConfig;
 
     private static SaveConfig saveConfig;
+
+    private static MasterConfig masterConfig;
 
     private static HTTPClient httpClient;
 
@@ -23,6 +26,14 @@ public class Configuration {
     private static TaskHandler taskHandler;
 
     private static TaskService taskService;
+
+    public static MasterConfig getMasterConfig() {
+        return masterConfig;
+    }
+
+    public static void setMasterConfig(MasterConfig masterConfig) {
+        Configuration.masterConfig = masterConfig;
+    }
 
     public static TaskService getTaskService() {
         return taskService;

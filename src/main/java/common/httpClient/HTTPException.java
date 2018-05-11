@@ -4,7 +4,7 @@ import common.BaseException;
 import common.EnumInterface;
 
 /**
- * Created by 希罗 on 2018/5/8
+ * Created by Mr.Luo on 2018/5/8
  */
 public class HTTPException extends BaseException{
 
