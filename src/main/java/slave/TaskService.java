@@ -1,5 +1,6 @@
 package slave;
 
+import common.BizResult;
 import common.Configuration;
 import java.util.Date;
 import javax.ws.rs.GET;
@@ -7,6 +8,8 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import slave.exception.SlaveException;
+import slave.exception.SlaveExceptionEnum;
 import task.Task;
 import task.TaskHandler;
 
@@ -24,21 +27,22 @@ public class TaskService {
      */
     @Path("execute")
     @GET
-    public void execute(@HeaderParam("date") Date date, @HeaderParam("partition") Integer partition){
+    public BizResult execute(@HeaderParam("date") Date date, @HeaderParam("partition") Integer partition){
 
-        TaskThreadPool taskThreadPool = Configuration.getTaskThreadPool();
         TaskHandler taskHandler = Configuration.getTaskHandler();
 
         Task task = taskHandler.getTask(date, partition);
 
         while(task != null){
             try {
-                taskThreadPool.addTask(task);
+                Configuration.getExecuteTaskThreadPool().addTask(task);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             task = task.getBeforeTask();
         }
+
+        return BizResult.createSuccessResult(null);
     }
 
     /**
@@ -47,14 +51,15 @@ public class TaskService {
      */
     @Path("execute")
     @POST
-    public void execute(Task task){
+    public BizResult execute(Task task){
 
-        TaskThreadPool taskThreadPool = Configuration.getTaskThreadPool();
         try {
-            taskThreadPool.addTask(task);
+            Configuration.getExecuteTaskThreadPool().addTask(task);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SlaveException(SlaveExceptionEnum.EXECUTE_ERROR);
         }
+
+        return BizResult.createSuccessResult(null);
     }
 
     /**
@@ -63,10 +68,11 @@ public class TaskService {
      */
     @Path("add")
     @POST
-    public void add(Task task){
+    public BizResult add(Task task){
 
         TaskHandler taskHandler = Configuration.getTaskHandler();
         taskHandler.saveTask(task);
+        return BizResult.createSuccessResult(null);
     }
 
 

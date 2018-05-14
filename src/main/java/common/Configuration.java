@@ -1,10 +1,15 @@
 package common;
 
 import common.httpClient.HTTPClient;
+import electon.ElectonConfig;
 import master.MasterConfig;
+import master.assign.AssignTaskThreadPool;
+import master.assign.ChooseNode;
+import master.assign.ChooseNode.DefaultChooseNode;
+import master.receive.ReceiveTaskThreadPool;
 import slave.SlaveConfig;
 import slave.TaskService;
-import slave.TaskThreadPool;
+import slave.ExecuteTaskThreadPool;
 import task.SaveConfig;
 import task.TaskHandler;
 
@@ -13,26 +18,42 @@ import task.TaskHandler;
  */
 public class Configuration {
 
-    private static SlaveConfig slaveConfig;
-
-    private static SaveConfig saveConfig;
-
-    private static MasterConfig masterConfig;
-
     private static HTTPClient httpClient;
-
-    private static TaskThreadPool taskThreadPool;
 
     private static TaskHandler taskHandler;
 
     private static TaskService taskService;
 
-    public static MasterConfig getMasterConfig() {
-        return masterConfig;
+    private static ChooseNode chooseNode = new DefaultChooseNode();
+
+    private static AssignTaskThreadPool assignTaskThreadPool;
+
+    private static ReceiveTaskThreadPool receiveTaskThreadPool;
+
+    private static ExecuteTaskThreadPool executeTaskThreadPool;
+
+    public static ReceiveTaskThreadPool getReceiveTaskThreadPool() {
+        return receiveTaskThreadPool;
     }
 
-    public static void setMasterConfig(MasterConfig masterConfig) {
-        Configuration.masterConfig = masterConfig;
+    public static void setReceiveTaskThreadPool(ReceiveTaskThreadPool receiveTaskThreadPool) {
+        Configuration.receiveTaskThreadPool = receiveTaskThreadPool;
+    }
+
+    public static AssignTaskThreadPool getAssignTaskThreadPool() {
+        return assignTaskThreadPool;
+    }
+
+    public static void setAssignTaskThreadPool(AssignTaskThreadPool assignTaskThreadPool) {
+        Configuration.assignTaskThreadPool = assignTaskThreadPool;
+    }
+
+    public static ChooseNode getChooseNode() {
+        return chooseNode;
+    }
+
+    public static void setChooseNode(ChooseNode chooseNode) {
+        Configuration.chooseNode = chooseNode;
     }
 
     public static TaskService getTaskService() {
@@ -51,28 +72,12 @@ public class Configuration {
         Configuration.taskHandler = taskHandler;
     }
 
-    public static TaskThreadPool getTaskThreadPool() {
-        return taskThreadPool;
+    public static ExecuteTaskThreadPool getExecuteTaskThreadPool() {
+        return executeTaskThreadPool;
     }
 
-    public static void setTaskThreadPool(TaskThreadPool taskThreadPool) {
-        Configuration.taskThreadPool = taskThreadPool;
-    }
-
-    public static SlaveConfig getSlaveConfig() {
-        return slaveConfig;
-    }
-
-    public static void setSlaveConfig(SlaveConfig slaveConfig) {
-        Configuration.slaveConfig = slaveConfig;
-    }
-
-    public static SaveConfig getSaveConfig() {
-        return saveConfig;
-    }
-
-    public static void setSaveConfig(SaveConfig saveConfig) {
-        Configuration.saveConfig = saveConfig;
+    public static void setExecuteTaskThreadPool(ExecuteTaskThreadPool executeTaskThreadPool) {
+        Configuration.executeTaskThreadPool = executeTaskThreadPool;
     }
 
     public static HTTPClient getHttpClient() {

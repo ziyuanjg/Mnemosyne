@@ -14,16 +14,16 @@ import task.TaskHandler;
 /**
  * Created by Mr.Luo on 2018/5/9
  */
-public class TaskThreadPool {
+public class ExecuteTaskThreadPool {
 
 
-    private static final ThreadPoolExecutor executeTaskPool = new ThreadPoolExecutor(SlaveConfig.getCorePoolSize(),
+    private final ThreadPoolExecutor executeTaskPool = new ThreadPoolExecutor(SlaveConfig.getCorePoolSize(),
             SlaveConfig.getMaxPoolSize(), SlaveConfig.getKeepAliveTime(), TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
 
-    private static final LinkedBlockingQueue<Task> taskQueue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<Task> taskQueue = new LinkedBlockingQueue<>();
 
-    static {
+    public ExecuteTaskThreadPool() {
 
         for(Integer i = 0; i < SlaveConfig.getMaxPoolSize(); i++){
 
@@ -31,7 +31,6 @@ public class TaskThreadPool {
             executeTaskPool.execute(taskThread);
         }
     }
-
 
     public void addTask(Task task) {
 
@@ -42,7 +41,7 @@ public class TaskThreadPool {
         taskQueue.add(task);
     }
 
-    private static class TaskThread implements Runnable {
+    private class TaskThread implements Runnable {
 
         private LinkedBlockingQueue<Task> taskQueue;
 

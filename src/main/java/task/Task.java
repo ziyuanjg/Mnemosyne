@@ -1,8 +1,10 @@
 package task;
 
+import com.alibaba.fastjson.JSON;
 import common.httpClient.RequestTypeEnum;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,5 +67,20 @@ public class Task implements Serializable{
      * 请求方式
      */
     private RequestTypeEnum requestTypeEnum;
+
+    public Map toMap(){
+        Map map = new HashMap(10);
+        map.put("lastTask", JSON.toJSONString(lastTask));
+        map.put("beforeTask", JSON.toJSONString(beforeTask));
+        map.put("index", index);
+        map.put("callBackType", callBackType.getCode());
+        map.put("url", url);
+        map.put("param", JSON.toJSONString(param));
+        map.put("header", JSON.toJSONString(header));
+        map.put("excuteTime", excuteTime);
+        map.put("createTime", createTime);
+        map.put("requestTypeEnum", requestTypeEnum.getCode());
+        return map;
+    }
 
 }
