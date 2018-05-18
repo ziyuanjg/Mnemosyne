@@ -66,7 +66,7 @@ public class FileUtil {
     /**
      * 将任务持久化到磁盘文件
      */
-    public void SaveTaskToFile(Task task, String fileName, File file, Integer fileNum, Long startIndex) {
+    public void SaveTaskToFile(Task task, File file, Integer fileNum, Long startIndex) {
         if (!file.getParentFile().exists()) {
             try {
                 file.getParentFile().mkdirs();
@@ -79,7 +79,7 @@ public class FileUtil {
             }
         }
 
-        writeToFile(file, fileName, JSON.toJSONBytes(task), SaveConfig.getTaskMAXLength(), startIndex);
+        writeToFile(file, JSON.toJSONBytes(task), SaveConfig.getTaskMAXLength(), startIndex);
     }
 
     /**
@@ -164,14 +164,14 @@ public class FileUtil {
                 .startId((fileNum - 1) * 1000)
                 .build();
         byte[] configBytes = JSON.toJSONBytes(fileConfig);
-        writeToFile(file, null, configBytes, FILE_CONFIG_LENGTH, null);
+        writeToFile(file, configBytes, FILE_CONFIG_LENGTH, null);
     }
 
-    private Integer writeToFile(File file, String fileName, byte[] value) {
-        return writeToFile(file, fileName, value, value.length, null);
+    private Integer writeToFile(File file, byte[] value) {
+        return writeToFile(file, value, value.length, null);
     }
 
-    private Integer writeToFile(File file, String fileName, byte[] value, Integer length, Long startIndex) {
+    private Integer writeToFile(File file, byte[] value, Integer length, Long startIndex) {
 
         if (length == null || value == null || value.length == 0 || length < value.length) {
             return 0;
@@ -190,10 +190,6 @@ public class FileUtil {
             }
         } catch (Exception e) {
             throw new FileException(TaskExceptionEnum.FILE_CREATE_FAIL, e);
-        } finally {
-            if (fileName != null) {
-                releaseFileLock(fileName);
-            }
         }
         return length;
     }

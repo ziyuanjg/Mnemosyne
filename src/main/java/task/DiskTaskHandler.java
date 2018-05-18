@@ -55,7 +55,14 @@ public class DiskTaskHandler extends AbstractTaskHandler {
                     FileUtil.FILE_CONFIG_LENGTH.longValue() + ((task.getId() - fileConfig.getStartId()) * SaveConfig
                             .getTaskMAXLength());
 
-            fileUtil.SaveTaskToFile(task, fileName, file, fileNum, startIndex);
+            try {
+                fileUtil.getFileLock(fileName);
+                fileUtil.SaveTaskToFile(task, file, fileNum, startIndex);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                fileUtil.releaseFileLock(fileName);
+            }
         } else {
 
             DateTime excuteTime = DateUtil.date(task.getExcuteTime());
@@ -72,9 +79,14 @@ public class DiskTaskHandler extends AbstractTaskHandler {
 
             } while (file.exists() && file.length() > FILE_MAX_LENGTH);
 
-            fileUtil.getFileLock(fileName);
-
-            fileUtil.SaveTaskToFile(task, fileName, file, fileNum, null);
+            try {
+                fileUtil.getFileLock(fileName);
+                fileUtil.SaveTaskToFile(task, file, fileNum, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                fileUtil.releaseFileLock(fileName);
+            }
         }
 
         return Boolean.TRUE;
