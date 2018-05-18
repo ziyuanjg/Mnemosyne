@@ -26,23 +26,23 @@ public class ReceiveTaskThreadPool {
 
     public ReceiveTaskThreadPool() {
 
-        for(Integer i = 0; i < SlaveConfig.getMaxPoolSize(); i++){
+        for (Integer i = 0; i < SlaveConfig.getMaxPoolSize(); i++) {
 
             ReceiveTaskThread taskThread = new ReceiveTaskThread(receiveTaskQueue);
             receiveTaskPool.execute(taskThread);
         }
     }
 
-    public void receiveTask(Task task, ServiceNode serviceNode){
+    public void receiveTask(Task task, ServiceNode serviceNode) {
 
-        if(task == null || serviceNode == null){
+        if (task == null || serviceNode == null) {
             return;
         }
         receiveTaskQueue.add(new ReceiveTaskDTO(task, serviceNode));
     }
 
 
-    private class ReceiveTaskThread implements Runnable{
+    private class ReceiveTaskThread implements Runnable {
 
         private final String addTaskUrl = "/salve/add";
         private LinkedBlockingQueue<ReceiveTaskDTO> receiveTaskQueue = null;
@@ -58,7 +58,7 @@ public class ReceiveTaskThreadPool {
 
                 ReceiveTaskDTO receiveTaskDTO = null;
 
-                while ((receiveTaskDTO = receiveTaskQueue.take()) != null){
+                while ((receiveTaskDTO = receiveTaskQueue.take()) != null) {
 
                     Task task = receiveTaskDTO.getTask();
                     ServiceNode serviceNode = receiveTaskDTO.getServiceNode();
@@ -72,7 +72,8 @@ public class ReceiveTaskThreadPool {
     }
 
     @Data
-    private class ReceiveTaskDTO{
+    private class ReceiveTaskDTO {
+
         private Task task;
         private ServiceNode serviceNode;
 

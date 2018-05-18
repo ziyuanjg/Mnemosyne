@@ -29,7 +29,7 @@ public class ServiceNode {
             return false;
         }
 
-        if(url == null){
+        if (url == null) {
             return false;
         }
 

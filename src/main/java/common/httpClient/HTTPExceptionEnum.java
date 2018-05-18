@@ -13,7 +13,7 @@ public enum HTTPExceptionEnum implements EnumInterface {
     private Integer code;
     private String message;
 
-    HTTPExceptionEnum(Integer code, String message){
+    HTTPExceptionEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

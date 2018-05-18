@@ -4,10 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 磁盘操作者
- * Created by Mr.Luo on 2018/4/28
+ * 文件锁 Created by Mr.Luo on 2018/4/28
  */
-public class FileHandler {
+public class FileLockHandler {
 
 
     /**
@@ -17,14 +16,12 @@ public class FileHandler {
 
     /**
      * 获取文件锁
-     * @param fileName
-     * @return
      */
-    public static Boolean getFileLock(String fileName){
+    public static Boolean getFileLock(String fileName) {
 
         Object lock = fileLockMap.putIfAbsent(fileName, new Object());
 
-        if(lock != null){
+        if (lock != null) {
             return Boolean.FALSE;
         }
 
@@ -33,9 +30,8 @@ public class FileHandler {
 
     /**
      * 释放文件锁
-     * @param fileName
      */
-    public static void releaseFileLock(String fileName){
+    public static void releaseFileLock(String fileName) {
 
         fileLockMap.remove(fileName);
     }

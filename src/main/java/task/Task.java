@@ -1,6 +1,7 @@
 package task;
 
 import com.alibaba.fastjson.JSON;
+import common.CallBackTypeEnum;
 import common.httpClient.RequestTypeEnum;
 import java.io.Serializable;
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 
 /**
@@ -16,22 +18,14 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class Task implements Serializable{
+public class Task implements Serializable {
 
-    /**
-     * 链路下级任务
-     */
-    private Task lastTask;
+    private Integer id;
 
     /**
      * 链路上级任务
      */
-    private Task beforeTask;
-
-    /**
-     * 在链路中的位置
-     */
-    private Integer index;
+    private transient Task beforeTask;
 
     /**
      * 任务回调请求方式
@@ -68,11 +62,15 @@ public class Task implements Serializable{
      */
     private RequestTypeEnum requestTypeEnum;
 
-    public Map toMap(){
+    /**
+     * 是否已执行
+     */
+    @Default
+    private Boolean isFinished = Boolean.FALSE;
+
+    public Map toMap() {
         Map map = new HashMap(10);
-        map.put("lastTask", JSON.toJSONString(lastTask));
         map.put("beforeTask", JSON.toJSONString(beforeTask));
-        map.put("index", index);
         map.put("callBackType", callBackType.getCode());
         map.put("url", url);
         map.put("param", JSON.toJSONString(param));

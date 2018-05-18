@@ -24,12 +24,13 @@ public class ReceiveTask {
      */
     @Path("receveTask")
     @POST
-    public BizResult receveTask(Task task){
+    public BizResult receveTask(Task task) {
 
         // 只有主节点才可以接收任务
-        if(ElectonConfig.getMasterNode().equals(ElectonConfig.getLocalNode())){
-            ElectonConfig.getServiceNodeList().stream().forEach(serviceNode -> Configuration.getReceiveTaskThreadPool().receiveTask(task, serviceNode));
-        }else {
+        if (ElectonConfig.getMasterNode().equals(ElectonConfig.getLocalNode())) {
+            ElectonConfig.getServiceNodeList().stream()
+                    .forEach(serviceNode -> Configuration.getReceiveTaskThreadPool().receiveTask(task, serviceNode));
+        } else {
             // 子节点将任务转发给主节点，主要为了防止误请求到子节点。
             sendTaskToMaster(task);
         }
@@ -37,7 +38,7 @@ public class ReceiveTask {
         return BizResult.createSuccessResult(null);
     }
 
-    private void sendTaskToMaster(Task task){
+    private void sendTaskToMaster(Task task) {
 
         HTTPClient httpClient = Configuration.getHttpClient();
         String url = ElectonConfig.getMasterNode().getUrl() + RECEVE_TASK_URL;

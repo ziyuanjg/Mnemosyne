@@ -14,10 +14,10 @@ import okhttp3.Response;
 /**
  * Created by Mr.Luo on 2018/5/4
  */
-public class OkHTTPClient extends BaseClient{
+public class OkHTTPClient extends BaseClient {
 
     @Override
-    String get(String url, Headers headers){
+    String get(String url, Headers headers) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -27,7 +27,7 @@ public class OkHTTPClient extends BaseClient{
     }
 
     @Override
-    String post(String url, Headers headers, Map<String, String> body){
+    String post(String url, Headers headers, Map<String, String> body) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -37,7 +37,7 @@ public class OkHTTPClient extends BaseClient{
     }
 
     @Override
-    void getWithCallBack(String url, Headers headers, Callback callback){
+    void getWithCallBack(String url, Headers headers, Callback callback) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -47,7 +47,7 @@ public class OkHTTPClient extends BaseClient{
     }
 
     @Override
-    void postWithCallBack(String url, Headers headers, Map<String, String> body, Callback callback){
+    void postWithCallBack(String url, Headers headers, Map<String, String> body, Callback callback) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -66,23 +66,23 @@ public class OkHTTPClient extends BaseClient{
         }
     }
 
-    private Request buildRequest(String url, Headers headers, Map<String, String> body){
+    private Request buildRequest(String url, Headers headers, Map<String, String> body) {
 
         Request.Builder builder = new Builder();
 
-        if(url == null){
+        if (url == null) {
             throw new HTTPException(HTTPExceptionEnum.PARAM_ERROR_URL);
         }
 
         builder.url(url);
 
-        if(headers != null){
+        if (headers != null) {
             builder.headers(headers);
         }
 
-        if(body != null && !body.isEmpty()){
+        if (body != null && !body.isEmpty()) {
             FormBody.Builder fromBody = new FormBody.Builder();
-            for(Entry<String, String> entry : body.entrySet()){
+            for (Entry<String, String> entry : body.entrySet()) {
                 fromBody.add(entry.getKey(), entry.getValue());
             }
             builder.post(fromBody.build());

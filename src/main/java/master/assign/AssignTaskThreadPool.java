@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import lombok.Builder;
 import lombok.Data;
 import master.MasterConfig;
 import slave.SlaveConfig;
@@ -28,23 +27,23 @@ public class AssignTaskThreadPool {
 
     public AssignTaskThreadPool() {
 
-        for(Integer i = 0; i < SlaveConfig.getMaxPoolSize(); i++){
+        for (Integer i = 0; i < SlaveConfig.getMaxPoolSize(); i++) {
 
             AssignThread taskThread = new AssignThread(assignQueue);
             assignTaskPool.execute(taskThread);
         }
     }
 
-    public void assignTask(Date date, Integer partition){
+    public void assignTask(Date date, Integer partition) {
 
-        if(date == null || partition == null){
+        if (date == null || partition == null) {
             return;
         }
 
         assignQueue.add(new AssignDTO(date, partition));
     }
 
-    private class AssignThread implements Runnable{
+    private class AssignThread implements Runnable {
 
         private final String addTaskUrl = "/salve/execute";
         private LinkedBlockingQueue<AssignDTO> assignQueue;
@@ -60,7 +59,7 @@ public class AssignTaskThreadPool {
 
                 AssignDTO assignDTO = null;
 
-                while((assignDTO = assignQueue.take()) != null){
+                while ((assignDTO = assignQueue.take()) != null) {
 
                     ServiceNode serviceNode = Configuration.getChooseNode().choose();
                     HTTPClient httpClient = Configuration.getHttpClient();
@@ -72,12 +71,9 @@ public class AssignTaskThreadPool {
         }
     }
 
-
-
-
-
     @Data
-    private class AssignDTO{
+    private class AssignDTO {
+
         private Date date;
         private Integer partition;
 
@@ -86,7 +82,7 @@ public class AssignTaskThreadPool {
             this.partition = partition;
         }
 
-        public Map toMap(){
+        public Map toMap() {
             Map map = new HashMap(2);
             map.put("date", date);
             map.put("partition", partition);

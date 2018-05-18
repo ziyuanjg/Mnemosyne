@@ -17,19 +17,19 @@ public class BizResult {
         this.data = data;
     }
 
-    public static BizResult createSuccessResult(Object data){
+    public static BizResult createSuccessResult(Object data) {
         return new BizResult(Boolean.TRUE, null, null, data);
     }
 
-    public static BizResult createSuccessResult(Object data, Integer code, String msg){
+    public static BizResult createSuccessResult(Object data, Integer code, String msg) {
         return new BizResult(Boolean.TRUE, code, msg, data);
     }
 
-    public static BizResult createErrorResult(Integer code, String msg){
+    public static BizResult createErrorResult(Integer code, String msg) {
         return new BizResult(Boolean.FALSE, code, msg, null);
     }
 
-    public static BizResult createErrorResult(EnumInterface enumInterface){
+    public static BizResult createErrorResult(EnumInterface enumInterface) {
         return new BizResult(Boolean.FALSE, enumInterface.getCode(), enumInterface.getMessage(), null);
     }
 }

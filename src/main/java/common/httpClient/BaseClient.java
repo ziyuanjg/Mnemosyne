@@ -7,7 +7,7 @@ import okhttp3.Headers;
 /**
  * Created by Mr.Luo on 2018/5/8
  */
-public abstract class BaseClient implements HTTPClient{
+public abstract class BaseClient implements HTTPClient {
 
     @Override
     public String send(String url, Headers headers, Map<String, String> body, RequestTypeEnum requestTypeEnum) {
@@ -15,7 +15,7 @@ public abstract class BaseClient implements HTTPClient{
         checkUrl(url);
 
         String result = null;
-        switch (requestTypeEnum){
+        switch (requestTypeEnum) {
             case GET:
                 result = get(url, headers);
                 break;
@@ -31,7 +31,7 @@ public abstract class BaseClient implements HTTPClient{
             RequestTypeEnum requestTypeEnum) {
 
         checkUrl(url);
-        switch (requestTypeEnum){
+        switch (requestTypeEnum) {
             case GET:
                 getWithCallBack(url, headers, callback);
                 break;
@@ -50,9 +50,9 @@ public abstract class BaseClient implements HTTPClient{
 
     abstract void postWithCallBack(String url, Headers headers, Map<String, String> body, Callback callback);
 
-    private void checkUrl(String url){
+    private void checkUrl(String url) {
 
-        if(!url.startsWith("http://") && !url.startsWith("https://")){
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "http://" + url;
         }
     }

@@ -1,16 +1,12 @@
 package common;
 
 import common.httpClient.HTTPClient;
-import electon.ElectonConfig;
-import master.MasterConfig;
 import master.assign.AssignTaskThreadPool;
 import master.assign.ChooseNode;
 import master.assign.ChooseNode.DefaultChooseNode;
 import master.receive.ReceiveTaskThreadPool;
-import slave.SlaveConfig;
-import slave.TaskService;
 import slave.ExecuteTaskThreadPool;
-import task.SaveConfig;
+import slave.TaskService;
 import task.TaskHandler;
 
 /**

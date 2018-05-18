@@ -12,7 +12,7 @@ public interface ChooseNode {
 
     ServiceNode choose();
 
-    class DefaultChooseNode implements ChooseNode{
+    class DefaultChooseNode implements ChooseNode {
 
         private List<ServiceNode> serviceNodeList = ElectonConfig.getServiceNodeList();
 

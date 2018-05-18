@@ -3,7 +3,6 @@ package master;
 
 import lombok.Builder;
 import lombok.Builder.Default;
-import slave.SlaveConfig;
 
 /**
  * Created by Mr.Luo on 2018/5/9

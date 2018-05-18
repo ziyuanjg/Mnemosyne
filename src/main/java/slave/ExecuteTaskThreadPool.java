@@ -25,7 +25,7 @@ public class ExecuteTaskThreadPool {
 
     public ExecuteTaskThreadPool() {
 
-        for(Integer i = 0; i < SlaveConfig.getMaxPoolSize(); i++){
+        for (Integer i = 0; i < SlaveConfig.getMaxPoolSize(); i++) {
 
             TaskThread taskThread = new TaskThread(taskQueue);
             executeTaskPool.execute(taskThread);
@@ -34,7 +34,7 @@ public class ExecuteTaskThreadPool {
 
     public void addTask(Task task) {
 
-        if(task == null){
+        if (task == null) {
             return;
         }
 
@@ -59,13 +59,13 @@ public class ExecuteTaskThreadPool {
 
                 try {
 
-                    if((task = taskQueue.take()) != null){
+                    if ((task = taskQueue.take()) != null) {
 
                         HTTPClient httpClient = Configuration.getHttpClient();
                         Headers headers = null;
-                        if(task.getHeader() != null){
+                        if (task.getHeader() != null) {
                             Headers.Builder builder = new Builder();
-                            for(Entry<String, String> entry : task.getHeader().entrySet()){
+                            for (Entry<String, String> entry : task.getHeader().entrySet()) {
                                 builder.add(entry.getKey(), entry.getValue());
                             }
                             headers = builder.build();
@@ -73,8 +73,9 @@ public class ExecuteTaskThreadPool {
 
                         httpClient.send(task.getUrl(), headers, task.getParam(), task.getRequestTypeEnum());
 
+                        task.setIsFinished(Boolean.TRUE);
                         TaskHandler taskHandler = Configuration.getTaskHandler();
-                        taskHandler.saveFinishTask(task);
+                        taskHandler.saveTask(task);
                     }
 
                 } catch (InterruptedException e) {

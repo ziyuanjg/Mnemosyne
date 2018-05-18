@@ -11,5 +11,6 @@ public interface HTTPClient {
 
     String send(String url, Headers headers, Map<String, String> body, RequestTypeEnum requestTypeEnum);
 
-    void sendWithCallBack(String url, Headers headers, Map<String, String> body, Callback callback, RequestTypeEnum requestTypeEnum);
+    void sendWithCallBack(String url, Headers headers, Map<String, String> body, Callback callback,
+            RequestTypeEnum requestTypeEnum);
 }

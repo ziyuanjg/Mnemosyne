@@ -14,8 +14,7 @@ import task.Task;
 import task.TaskHandler;
 
 /**
- * 任务处理器
- * Created by Mr.Luo on 2018/5/3
+ * 任务处理器 Created by Mr.Luo on 2018/5/3
  */
 @Path("/salve")
 @Produces({"application/xml", "application/json"})
@@ -23,17 +22,16 @@ public class TaskService {
 
     /**
      * 执行指定时间区任务
-     * @param date
      */
     @Path("execute")
     @GET
-    public BizResult execute(@HeaderParam("date") Date date, @HeaderParam("partition") Integer partition){
+    public BizResult execute(@HeaderParam("date") Date date, @HeaderParam("partition") Integer partition) {
 
         TaskHandler taskHandler = Configuration.getTaskHandler();
 
         Task task = taskHandler.getTask(date, partition);
 
-        while(task != null){
+        while (task != null) {
             try {
                 Configuration.getExecuteTaskThreadPool().addTask(task);
             } catch (Exception e) {
@@ -47,11 +45,10 @@ public class TaskService {
 
     /**
      * 执行指定任务
-     * @param task
      */
     @Path("execute")
     @POST
-    public BizResult execute(Task task){
+    public BizResult execute(Task task) {
 
         try {
             Configuration.getExecuteTaskThreadPool().addTask(task);
@@ -64,11 +61,10 @@ public class TaskService {
 
     /**
      * 新增任务
-     * @param task
      */
     @Path("add")
     @POST
-    public BizResult add(Task task){
+    public BizResult add(Task task) {
 
         TaskHandler taskHandler = Configuration.getTaskHandler();
         taskHandler.saveTask(task);

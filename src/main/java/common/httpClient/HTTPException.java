@@ -6,7 +6,7 @@ import common.EnumInterface;
 /**
  * Created by Mr.Luo on 2018/5/8
  */
-public class HTTPException extends BaseException{
+public class HTTPException extends BaseException {
 
     public HTTPException(EnumInterface exception) {
         super(exception);

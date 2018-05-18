@@ -1,9 +1,12 @@
+import com.alibaba.fastjson.JSON;
 import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
+import java.util.Map;
 import task.SaveConfig;
 import java.util.Date;
 import org.junit.Test;
-import task.CallBackTypeEnum;
+import common.CallBackTypeEnum;
 import task.DiskTaskHandler;
 import task.Task;
 
@@ -21,7 +24,7 @@ public class ioTest {
 
         Date date = new Date();
         Long time1 = System.currentTimeMillis();
-        for(Integer i = 0; i < 100000; i++){
+        for(Integer i = 0; i < 100; i++){
             Task task = Task.builder()
                     .url(i.toString())
                     .callBackType(CallBackTypeEnum.HTTP)
@@ -37,19 +40,5 @@ public class ioTest {
         Task task = diskSaveTask.getTask(date,0);
 
         System.out.println("读取花费"+(System.currentTimeMillis() - time2)+"ms");
-    }
-
-@Test
-    public void ttt(){
-
-        File file = new File("/Users/xiluo/2018-01-01/012/2018-01-01 01:10:10");
-        if(!file.getParentFile().exists()){
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

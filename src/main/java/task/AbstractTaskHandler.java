@@ -12,8 +12,10 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractTaskHandler implements TaskHandler {
 
-    ThreadPoolExecutor savePool = new ThreadPoolExecutor(SaveConfig.getCorePoolSize(), SaveConfig.getMaxPoolSize(), SaveConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-    ThreadPoolExecutor getPool = new ThreadPoolExecutor(SaveConfig.getCorePoolSize(), SaveConfig.getMaxPoolSize(), SaveConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    ThreadPoolExecutor savePool = new ThreadPoolExecutor(SaveConfig.getCorePoolSize(), SaveConfig.getMaxPoolSize(),
+            SaveConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    ThreadPoolExecutor getPool = new ThreadPoolExecutor(SaveConfig.getCorePoolSize(), SaveConfig.getMaxPoolSize(),
+            SaveConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     @Override
     public Boolean saveTask(Task task) {
@@ -46,21 +48,6 @@ public abstract class AbstractTaskHandler implements TaskHandler {
     }
 
     @Override
-    public Boolean saveFinishTask(Task task) {
-
-        try {
-            Future<Boolean> future = savePool.submit(() -> saveFinish(task));
-            return future.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return Boolean.FALSE;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return Boolean.FALSE;
-        }
-    }
-
-    @Override
     public Integer getPartitionCount(Date date) {
         return null;
     }
@@ -71,5 +58,4 @@ public abstract class AbstractTaskHandler implements TaskHandler {
 
     abstract Task get(Date date, Integer partition);
 
-    abstract Boolean saveFinish(Task task);
 }
