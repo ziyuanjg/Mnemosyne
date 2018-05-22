@@ -13,6 +13,8 @@ public enum TaskExceptionEnum implements EnumInterface {
     FILE_GET_CONFIG_FAIL(1004, "获取文件配置失败"),
     FILE_PARTITION_ERROR(1005, "分区选择错误"),
     FILE_TASK_ERROR(1006, "读取任务失败"),
+    FILE_MAINCONFIG_WRITE_ERROR(1007, "写入主配置失败"),
+    FILE_MAINCONFIG_READ_ERROR(1008, "读取主配置失败"),
 
     PARAM_ERROR_PARTITION(1050, "缺少分区参数"),
     PARAM_ERROR_DATE(1051, "缺少日期参数")

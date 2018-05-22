@@ -17,7 +17,8 @@ public class SaveConfig {
     /**
      * 磁盘持久化目录
      */
-    private static String filePath;
+    @Default
+    private static String filePath = "/Users/admin/mnemosyne/";
 
     /**
      * 持久化线程池-核心线程数

@@ -7,7 +7,8 @@ import common.EnumInterface;
  */
 public enum HTTPExceptionEnum implements EnumInterface {
 
-    PARAM_ERROR_URL(2001, "参数url为空或格式错误");
+    PARAM_ERROR_URL(2001, "参数错误");
+
 
 
     private Integer code;

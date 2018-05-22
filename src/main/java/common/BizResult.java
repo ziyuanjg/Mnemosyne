@@ -1,8 +1,11 @@
 package common;
 
+import lombok.Data;
+
 /**
  * Created by Mr.Luo on 2018/5/14
  */
+@Data
 public class BizResult {
 
     private Boolean success;

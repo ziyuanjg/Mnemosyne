@@ -1,11 +1,15 @@
 package task;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import task.SaveConfig;
+import task.Task;
+import task.TaskHandler;
 
 /**
  * Created by Mr.Luo on 2018/5/2
@@ -49,13 +53,22 @@ public abstract class AbstractTaskHandler implements TaskHandler {
 
     @Override
     public Integer getPartitionCount(Date date) {
-        return null;
+
+        return getPartitionNum(date);
     }
 
-    abstract Integer getPartitionNum(Date date);
+    @Override
+    public List<Task> getUnFinishedTaskIdList(Date date) {
 
-    abstract Boolean save(Task task);
+        return getUnFinishedTaskIds(date);
+    }
 
-    abstract Task get(Date date, Integer partition);
+    protected abstract List<Task> getUnFinishedTaskIds(Date date);
+
+    protected abstract Integer getPartitionNum(Date date);
+
+    protected abstract Boolean save(Task task);
+
+    protected abstract Task get(Date date, Integer partition);
 
 }

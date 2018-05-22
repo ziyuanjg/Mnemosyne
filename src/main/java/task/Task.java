@@ -68,17 +68,41 @@ public class Task implements Serializable {
     @Default
     private Boolean isFinished = Boolean.FALSE;
 
-    public Map toMap() {
-        Map map = new HashMap(10);
+    public Map<String, String> toMap() {
+        Map<String, String> map = new HashMap(10);
         map.put("beforeTask", JSON.toJSONString(beforeTask));
-        map.put("callBackType", callBackType.getCode());
+        map.put("callBackType", callBackType.getCode().toString());
         map.put("url", url);
         map.put("param", JSON.toJSONString(param));
         map.put("header", JSON.toJSONString(header));
-        map.put("excuteTime", excuteTime);
-        map.put("createTime", createTime);
-        map.put("requestTypeEnum", requestTypeEnum.getCode());
+        map.put("excuteTime", String.valueOf(excuteTime.getTime()));
+        map.put("createTime", String.valueOf(createTime.getTime()));
+        map.put("requestTypeEnum", requestTypeEnum.getCode().toString());
         return map;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Task task = (Task) o;
+
+        if (id != null ? !id.equals(task.id) : task.id != null) {
+            return false;
+        }
+        return excuteTime != null ? excuteTime.equals(task.excuteTime) : task.excuteTime == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (excuteTime != null ? excuteTime.hashCode() : 0);
+        return result;
+    }
 }

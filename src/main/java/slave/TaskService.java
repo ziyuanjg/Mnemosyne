@@ -3,11 +3,13 @@ package slave;
 import common.BizResult;
 import common.Configuration;
 import java.util.Date;
+import java.util.List;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import slave.exception.SlaveException;
 import slave.exception.SlaveExceptionEnum;
 import task.Task;
@@ -17,15 +19,15 @@ import task.TaskHandler;
  * 任务处理器 Created by Mr.Luo on 2018/5/3
  */
 @Path("/salve")
-@Produces({"application/xml", "application/json"})
+@Produces({"application/json"})
 public class TaskService {
 
     /**
      * 执行指定时间区任务
      */
-    @Path("execute")
-    @GET
-    public BizResult execute(@HeaderParam("date") Date date, @HeaderParam("partition") Integer partition) {
+    @Path("executeByPartition")
+    @POST
+    public BizResult execute(@FormParam("date") Date date, @FormParam("partition") Integer partition) {
 
         TaskHandler taskHandler = Configuration.getTaskHandler();
 
@@ -46,7 +48,7 @@ public class TaskService {
     /**
      * 执行指定任务
      */
-    @Path("execute")
+    @Path("executeByTask")
     @POST
     public BizResult execute(Task task) {
 
@@ -71,5 +73,15 @@ public class TaskService {
         return BizResult.createSuccessResult(null);
     }
 
+    /**
+     * 查询此时间点之前的所有未完成任务id列表
+     */
+    @Path("getUnFinishedTaskIdList")
+    @GET
+    public BizResult getUnFinishedTaskIdList(@QueryParam("date") Date date) {
 
+        TaskHandler taskHandler = Configuration.getTaskHandler();
+        List<Task> idList = taskHandler.getUnFinishedTaskIdList(date);
+        return BizResult.createSuccessResult(idList);
+    }
 }

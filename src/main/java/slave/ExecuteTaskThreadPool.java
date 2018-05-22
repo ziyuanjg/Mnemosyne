@@ -2,6 +2,7 @@ package slave;
 
 import common.Configuration;
 import common.httpClient.HTTPClient;
+import electon.ElectonConfig;
 import java.util.Map.Entry;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -45,6 +46,7 @@ public class ExecuteTaskThreadPool {
 
         private LinkedBlockingQueue<Task> taskQueue;
 
+        private final String FINISHED_TASK_URL = "master/receveFinishedTask/";
 
         TaskThread(LinkedBlockingQueue<Task> taskQueue) {
             this.taskQueue = taskQueue;
@@ -76,12 +78,20 @@ public class ExecuteTaskThreadPool {
                         task.setIsFinished(Boolean.TRUE);
                         TaskHandler taskHandler = Configuration.getTaskHandler();
                         taskHandler.saveTask(task);
+
+                        sendFinishedTaskToMaster(httpClient, task);
                     }
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+        }
+
+        private void sendFinishedTaskToMaster(HTTPClient httpClient, Task task){
+
+            task.setIsFinished(Boolean.TRUE);
+            httpClient.send(ElectonConfig.getMasterNode().getUrl() + FINISHED_TASK_URL, null, task.toMap(), task.getRequestTypeEnum());
         }
     }
 }

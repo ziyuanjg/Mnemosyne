@@ -1,9 +1,16 @@
-package task;
+package task.disk;
 
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import task.AbstractTaskHandler;
+import task.SaveConfig;
+import task.Task;
 import task.exception.FileException;
 import task.exception.TaskExceptionEnum;
 
@@ -17,8 +24,11 @@ public class DiskTaskHandler extends AbstractTaskHandler {
     private final Integer FILE_MAX_LENGTH =
             (SaveConfig.getTaskMAXLength() * SaveConfig.getTaskNumOfPartition()) + FileUtil.FILE_CONFIG_LENGTH;
 
+    private final MainConfig mainConfig = fileUtil.getMainConfig();
+
+
     @Override
-    Boolean save(Task task) {
+    protected Boolean save(Task task) {
 
         if (task == null) {
             return Boolean.FALSE;
@@ -47,7 +57,7 @@ public class DiskTaskHandler extends AbstractTaskHandler {
             }
 
             FileConfig fileConfig = fileUtil.getFileConfig(file);
-            if (fileConfig.getStartId() > task.getId() || (fileConfig.getStartId() + 1000) < task.getId()) {
+            if (fileConfig.getStartId() > task.getId() || (fileConfig.getStartId() + SaveConfig.getTaskNumOfPartition()) < task.getId()) {
                 throw new FileException(TaskExceptionEnum.FILE_PARTITION_ERROR);
             }
 
@@ -58,6 +68,15 @@ public class DiskTaskHandler extends AbstractTaskHandler {
             try {
                 fileUtil.getFileLock(fileName);
                 fileUtil.SaveTaskToFile(task, file, fileNum, startIndex);
+
+                fileConfig.getFinishedTask().incrementAndGet();
+                fileUtil.setFileConfig(file, fileConfig);
+
+                if(mainConfig.getFinishedLastDate() == null || task.getExcuteTime().getTime() > mainConfig.getFinishedLastDate().getTime()){
+                    mainConfig.setFinishedLastDate(task.getExcuteTime());
+                }
+                mainConfig.getFinishedTaskCount().incrementAndGet();
+                fileUtil.setMainConfig(mainConfig);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -82,6 +101,14 @@ public class DiskTaskHandler extends AbstractTaskHandler {
             try {
                 fileUtil.getFileLock(fileName);
                 fileUtil.SaveTaskToFile(task, file, fileNum, null);
+
+                FileConfig fileConfig = fileUtil.getFileConfig(file);
+
+                fileConfig.getEndId().incrementAndGet();
+                fileUtil.setFileConfig(file, fileConfig);
+
+                mainConfig.getTaskCount().incrementAndGet();
+                fileUtil.setMainConfig(mainConfig);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -93,7 +120,7 @@ public class DiskTaskHandler extends AbstractTaskHandler {
     }
 
     @Override
-    Task get(Date date, Integer partition) {
+    protected Task get(Date date, Integer partition) {
 
         if (date == null) {
             throw new FileException(TaskExceptionEnum.PARAM_ERROR_DATE);
@@ -129,7 +156,7 @@ public class DiskTaskHandler extends AbstractTaskHandler {
     }
 
     @Override
-    Integer getPartitionNum(Date date) {
+    protected Integer getPartitionNum(Date date) {
 
         DateTime excuteTime = DateUtil.date(date);
         String filePath = fileUtil.getFilePath(excuteTime);
@@ -143,4 +170,44 @@ public class DiskTaskHandler extends AbstractTaskHandler {
         }
     }
 
+    @Override
+    protected List<Task> getUnFinishedTaskIds(Date date) {
+
+        Date lastRunDate = mainConfig.getFinishedLastDate();
+
+        if(lastRunDate.getTime() >= date.getTime()){
+            return new ArrayList<Task>(0);
+        }
+
+        DateTime dateTime = DateUtil.date(lastRunDate);
+
+        List<Task> taskList = new ArrayList<>();
+        do {
+
+            File datePath = new File(fileUtil.getFilePath(dateTime));
+            if(datePath.exists() && datePath.isDirectory()){
+                File[] files = datePath.listFiles();
+                Arrays.stream(files).forEach(file -> {
+                    FileConfig fileConfig = fileUtil.getFileConfig(file);
+                    if(fileConfig == null || fileConfig.isFinish()){
+                        return;
+                    }
+
+                    Task task = fileUtil.getTaskFromFile(file);
+                    if(task != null){
+                        do {
+
+                            if(!task.getIsFinished()){
+                                taskList.add(task);
+                            }
+                        } while((task = task.getBeforeTask()) != null);
+                    }
+                });
+            }
+
+            dateTime.setField(DateField.SECOND, dateTime.second() + 1);
+        } while (dateTime.getTime() < lastRunDate.getTime());
+
+        return taskList;
+    }
 }

@@ -1,6 +1,7 @@
 package task;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 1、小文件分片存储 2、大文件分秒存储 3、redis 4、mysql Created by Mr.Luo on 2018/4/28
@@ -21,5 +22,11 @@ public interface TaskHandler {
      * 读取某一时间点的任务分区数量
      */
     Integer getPartitionCount(Date date);
+
+    /**
+     * 获取指定时间前的未执行任务id列表
+     */
+    List<Task> getUnFinishedTaskIdList(Date date);
+
 
 }
