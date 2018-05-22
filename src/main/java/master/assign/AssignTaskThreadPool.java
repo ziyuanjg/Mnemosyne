@@ -80,7 +80,7 @@ public class AssignTaskThreadPool {
 
                 while ((assignDTO = assignQueue.take()) != null) {
 
-                    ServiceNode serviceNode = Configuration.getChooseNode().choose();
+                    ServiceNode serviceNode = Configuration.getLoadStrategy().getSlaveNode();
                     HTTPClient httpClient = Configuration.getHttpClient();
                     httpClient.send(serviceNode.getUrl() + addTaskUrl, null, assignDTO.toMap(), RequestTypeEnum.POST);
                 }
@@ -134,7 +134,7 @@ public class AssignTaskThreadPool {
                             httpClient.send(serviceNode.getUrl() + addTaskUrl, null, tasktmp.toMap(), RequestTypeEnum.POST);
                         });
                     }else {
-                        ServiceNode serviceNode = Configuration.getChooseNode().choose();
+                        ServiceNode serviceNode = Configuration.getLoadStrategy().getSlaveNode();
                         httpClient.send(serviceNode.getUrl() + addTaskUrl, null, task.toMap(), RequestTypeEnum.POST);
                     }
                 }

@@ -2,8 +2,8 @@ package common;
 
 import common.httpClient.HTTPClient;
 import master.assign.AssignTaskThreadPool;
-import master.assign.ChooseNode;
-import master.assign.ChooseNode.DefaultChooseNode;
+import master.assign.LoadStrategy;
+import master.assign.LoadStrategy.DefaultLoadStrategy;
 import master.receive.ReceiveTaskThreadPool;
 import slave.ExecuteTaskThreadPool;
 import slave.TaskService;
@@ -20,7 +20,7 @@ public class Configuration {
 
     private static TaskService taskService;
 
-    private static ChooseNode chooseNode = new DefaultChooseNode();
+    private static LoadStrategy loadStrategy = new DefaultLoadStrategy();
 
     private static AssignTaskThreadPool assignTaskThreadPool;
 
@@ -42,14 +42,6 @@ public class Configuration {
 
     public static void setAssignTaskThreadPool(AssignTaskThreadPool assignTaskThreadPool) {
         Configuration.assignTaskThreadPool = assignTaskThreadPool;
-    }
-
-    public static ChooseNode getChooseNode() {
-        return chooseNode;
-    }
-
-    public static void setChooseNode(ChooseNode chooseNode) {
-        Configuration.chooseNode = chooseNode;
     }
 
     public static TaskService getTaskService() {
@@ -82,5 +74,14 @@ public class Configuration {
 
     public static void setHttpClient(HTTPClient httpClient) {
         Configuration.httpClient = httpClient;
+    }
+
+
+    public static LoadStrategy getLoadStrategy() {
+        return loadStrategy;
+    }
+
+    public static void setLoadStrategy(LoadStrategy loadStrategy) {
+        Configuration.loadStrategy = loadStrategy;
     }
 }
