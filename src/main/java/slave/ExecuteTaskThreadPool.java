@@ -2,7 +2,7 @@ package slave;
 
 import common.Configuration;
 import common.httpClient.HTTPClient;
-import electon.ElectonConfig;
+import election.ElectionConfig;
 import java.util.Map.Entry;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -91,7 +91,7 @@ public class ExecuteTaskThreadPool {
         private void sendFinishedTaskToMaster(HTTPClient httpClient, Task task){
 
             task.setIsFinished(Boolean.TRUE);
-            httpClient.send(ElectonConfig.getMasterNode().getUrl() + FINISHED_TASK_URL, null, task.toMap(), task.getRequestTypeEnum());
+            httpClient.send(ElectionConfig.getMasterNode().getUrl() + FINISHED_TASK_URL, null, task.toMap(), task.getRequestTypeEnum());
         }
     }
 }

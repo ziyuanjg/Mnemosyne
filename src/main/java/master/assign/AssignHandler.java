@@ -7,8 +7,8 @@ import com.alibaba.fastjson.JSON;
 import common.Configuration;
 import common.httpClient.HTTPClient;
 import common.httpClient.RequestTypeEnum;
-import electon.ElectonConfig;
-import electon.ServiceNode;
+import election.ElectionConfig;
+import election.ServiceNode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +37,7 @@ public class AssignHandler {
      */
     private void assignOldTask(Date date) {
 
-        List<ServiceNode> serviceNodeList = ElectonConfig.getServiceNodeList();
+        List<ServiceNode> serviceNodeList = ElectionConfig.getServiceNodeList();
         List<Task> allTaskList = new ArrayList<>();
         List<Task> retainAllTaskList = new ArrayList<>();
         serviceNodeList.stream().forEach(serviceNode -> {
@@ -91,5 +91,9 @@ public class AssignHandler {
                 CURRENT_TIME.setField(DateField.SECOND, CURRENT_TIME.second() + 1);
             }
         }
+    }
+
+    public DateTime getCURRENT_TIME() {
+        return CURRENT_TIME;
     }
 }

@@ -5,7 +5,7 @@ import common.Configuration;
 import common.httpClient.HTTPClient;
 import common.httpClient.HTTPExceptionEnum;
 import common.httpClient.RequestTypeEnum;
-import electon.ElectonConfig;
+import election.ElectionConfig;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -33,9 +33,13 @@ public class ReceiveTask {
         }
 
         // 只有主节点才可以接收任务
-        if (ElectonConfig.getMasterNode().equals(ElectonConfig.getLocalNode())) {
-            ElectonConfig.getServiceNodeList().stream()
+        if (ElectionConfig.getMasterNode().equals(ElectionConfig.getLocalNode())) {
+            ElectionConfig.getServiceNodeList().stream()
                     .forEach(serviceNode -> Configuration.getReceiveTaskThreadPool().receiveTask(task, serviceNode));
+
+            if(task.getExcuteTime().getTime() <= Configuration.getAssignHandler().getCURRENT_TIME().getTime()){
+                Configuration.getAssignTaskThreadPool().assignTask(task);
+            }
         } else {
             // 子节点将任务转发给主节点，主要为了防止误请求到子节点。
             sendTaskToMaster(task);
@@ -60,7 +64,7 @@ public class ReceiveTask {
         task.setIsFinished(Boolean.TRUE);
 
         // 只有主节点才可以接收任务
-        if (ElectonConfig.getMasterNode().equals(ElectonConfig.getLocalNode())) {
+        if (ElectionConfig.getMasterNode().equals(ElectionConfig.getLocalNode())) {
             Configuration.getAssignTaskThreadPool().assignTask(task);
         } else {
             // 子节点将任务转发给主节点，主要为了防止误请求到子节点。
@@ -73,14 +77,14 @@ public class ReceiveTask {
     private void sendFinishedTaskToMaster(Task task){
 
         HTTPClient httpClient = Configuration.getHttpClient();
-        String url = ElectonConfig.getMasterNode().getUrl() + RECEVE_FINISHED_TASK_URL;
+        String url = ElectionConfig.getMasterNode().getUrl() + RECEVE_FINISHED_TASK_URL;
         httpClient.send(url, null, task.toMap(), RequestTypeEnum.POST);
     }
 
     private void sendTaskToMaster(Task task) {
 
         HTTPClient httpClient = Configuration.getHttpClient();
-        String url = ElectonConfig.getMasterNode().getUrl() + RECEVE_TASK_URL;
+        String url = ElectionConfig.getMasterNode().getUrl() + RECEVE_TASK_URL;
         httpClient.send(url, null, task.toMap(), RequestTypeEnum.POST);
     }
 }

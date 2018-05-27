@@ -1,6 +1,7 @@
 package common;
 
 import common.httpClient.HTTPClient;
+import master.assign.AssignHandler;
 import master.assign.AssignTaskThreadPool;
 import master.assign.LoadStrategy;
 import master.assign.LoadStrategy.DefaultLoadStrategy;
@@ -27,6 +28,16 @@ public class Configuration {
     private static ReceiveTaskThreadPool receiveTaskThreadPool;
 
     private static ExecuteTaskThreadPool executeTaskThreadPool;
+
+    private static AssignHandler assignHandler;
+
+    public static AssignHandler getAssignHandler() {
+        return assignHandler;
+    }
+
+    public static void setAssignHandler(AssignHandler assignHandler) {
+        Configuration.assignHandler = assignHandler;
+    }
 
     public static ReceiveTaskThreadPool getReceiveTaskThreadPool() {
         return receiveTaskThreadPool;

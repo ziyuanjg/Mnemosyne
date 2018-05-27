@@ -3,8 +3,8 @@ package master.assign;
 import common.Configuration;
 import common.httpClient.HTTPClient;
 import common.httpClient.RequestTypeEnum;
-import electon.ElectonConfig;
-import electon.ServiceNode;
+import election.ElectionConfig;
+import election.ServiceNode;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -130,7 +130,7 @@ public class AssignTaskThreadPool {
                     HTTPClient httpClient = Configuration.getHttpClient();
                     if(task.getIsFinished()){
                         Task tasktmp = task;
-                        ElectonConfig.getServiceNodeList().stream().forEach(serviceNode -> {
+                        ElectionConfig.getServiceNodeList().stream().forEach(serviceNode -> {
                             httpClient.send(serviceNode.getUrl() + addTaskUrl, null, tasktmp.toMap(), RequestTypeEnum.POST);
                         });
                     }else {

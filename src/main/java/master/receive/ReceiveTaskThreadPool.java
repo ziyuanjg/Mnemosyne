@@ -3,7 +3,7 @@ package master.receive;
 import common.Configuration;
 import common.httpClient.HTTPClient;
 import common.httpClient.RequestTypeEnum;
-import electon.ServiceNode;
+import election.ServiceNode;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;

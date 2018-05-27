@@ -1,7 +1,7 @@
 package master.assign;
 
-import electon.ElectonConfig;
-import electon.ServiceNode;
+import election.ElectionConfig;
+import election.ServiceNode;
 import java.util.List;
 import java.util.Random;
 
@@ -20,7 +20,7 @@ public interface LoadStrategy {
         @Override
         public ServiceNode getSlaveNode() {
 
-            List<ServiceNode> serviceNodeList = ElectonConfig.getServiceNodeList();
+            List<ServiceNode> serviceNodeList = ElectionConfig.getServiceNodeList();
 
             return serviceNodeList.get(new Random().nextInt(serviceNodeList.size() - 1));
         }

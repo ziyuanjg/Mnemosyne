@@ -1,4 +1,4 @@
-package electon;
+package election;
 
 import java.util.List;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import lombok.Builder;
  * Created by Mr.Luo on 2018/5/10
  */
 @Builder
-public class ElectonConfig {
+public class ElectionConfig {
 
     /**
      * 从节点列表
@@ -29,7 +29,7 @@ public class ElectonConfig {
     }
 
     public static void setLocalNode(ServiceNode localNode) {
-        ElectonConfig.localNode = localNode;
+        ElectionConfig.localNode = localNode;
     }
 
     public static List<ServiceNode> getServiceNodeList() {
@@ -37,7 +37,7 @@ public class ElectonConfig {
     }
 
     public static void setServiceNodeList(List<ServiceNode> serviceNodeList) {
-        ElectonConfig.serviceNodeList = serviceNodeList;
+        ElectionConfig.serviceNodeList = serviceNodeList;
     }
 
     public static ServiceNode getMasterNode() {
@@ -45,6 +45,14 @@ public class ElectonConfig {
     }
 
     public static void setMasterNode(ServiceNode masterNode) {
-        ElectonConfig.masterNode = masterNode;
+        ElectionConfig.masterNode = masterNode;
+    }
+
+    public static void addServiceNode(ServiceNode serviceNode){
+        serviceNodeList.add(serviceNode);
+    }
+
+    public static void removeServiceNode(ServiceNode serviceNode){
+        serviceNodeList.remove(serviceNode);
     }
 }

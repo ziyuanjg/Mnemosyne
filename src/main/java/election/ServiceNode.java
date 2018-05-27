@@ -1,4 +1,4 @@
-package electon;
+package election;
 
 import lombok.Data;
 
