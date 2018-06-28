@@ -6,10 +6,13 @@ import common.Configuration;
 import common.httpClient.RequestTypeEnum;
 import election.ElectionConfig;
 import java.util.concurrent.atomic.AtomicInteger;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.Headers;
 
 /**
  * Created by Mr.Luo on 2018/6/27
  */
+@Slf4j(topic = "slave")
 public class SlaveNodeService {
 
     /**
@@ -23,19 +26,31 @@ public class SlaveNodeService {
     private final AtomicInteger failNum = new AtomicInteger(0);
 
     /**
-     * 允许连续心跳请求连续失败的最大次数
-     */
-    private final Integer failMaxNum = 3;
-
-    /**
-     * 心跳间隔时间
-     */
-    private final Long heartTime = 5000L;
-
-    /**
      * 标识本节点为子节点，如果在后续的选举中当选为主节点，则应终止子节点线程
      */
-    public Boolean isSlave = Boolean.TRUE;
+    public static Boolean isSlave = Boolean.TRUE;
+
+    /**
+     * 开启子节点主控线程
+     */
+    public void startSlaveService(){
+
+        isSlave = Boolean.TRUE;
+        Thread thread = new Thread(new SlaveService());
+        thread.start();
+    }
+
+    /**
+     * 停止子节点主控线程
+     */
+    public void stopSlaveService(){
+
+        isSlave = Boolean.FALSE;
+    }
+
+    public Integer getFailNum() {
+        return failNum.get();
+    }
 
     /**
      * 子节点主控线程
@@ -49,8 +64,12 @@ public class SlaveNodeService {
             while (isSlave) {
 
                 try {
+                    Headers headers = new Headers.Builder()
+                            .add("url", ElectionConfig.getLocalNode().getUrl())
+                            .add("time", String.valueOf(System.currentTimeMillis()))
+                            .build();
                     String result = Configuration.getHttpClient().send(ElectionConfig.getMasterNode().getUrl() + heartUrl,
-                            null,
+                            headers,
                             null,
                             RequestTypeEnum.GET);
 
@@ -62,16 +81,18 @@ public class SlaveNodeService {
                     failNum.incrementAndGet();
                 }
 
-                if(failNum.get() >= failMaxNum){
+                if(failNum.get() >= SlaveConfig.getFailMaxNum()){
 
                     // 从集群中踢掉当前主节点
-                    ElectionConfig.removeNode(ElectionConfig.getMasterNode());
+//                    ElectionConfig.removeNode(ElectionConfig.getMasterNode());
+//                    ElectionConfig.setMasterNode(null);
                     // 发起选举
                     Configuration.getElectionService().startElection();
+                    stopSlaveService();
                 }
 
                 try {
-                    Thread.sleep(heartTime);
+                    Thread.sleep(SlaveConfig.getHeartTime());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

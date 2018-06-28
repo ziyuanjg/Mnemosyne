@@ -22,11 +22,12 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
 import okhttp3.Response;
+import slave.SlaveNodeService;
 
 /**
  * Created by Mr.Luo on 2018/5/23
  */
-@Slf4j
+@Slf4j(topic = "election")
 @Path("election")
 public class ElectionService {
 
@@ -99,6 +100,11 @@ public class ElectionService {
     private Thread electionThread;
 
     /**
+     * 是否为支持选举状态
+     */
+    private Boolean supportLaunch = Boolean.FALSE;
+
+    /**
      * 发起选举
      */
     public void launchElection() {
@@ -107,7 +113,7 @@ public class ElectionService {
 
         sendLaunchMsg();
 
-        while (checkNodeNum.get() < ElectionConfig.getServiceNodeList().size()){
+        while (checkNodeNum.get() < ElectionConfig.getServiceNodeList().size()) {
             try {
                 Thread.sleep(50L);
             } catch (InterruptedException e) {
@@ -159,7 +165,13 @@ public class ElectionService {
                 finishExecute(electionDTO, url);
                 break;
             case COMPARE:
-                compareExecute(electionDTO, url, builder);
+                compareExecute(builder);
+                break;
+            case FIND:
+                findExecute(builder);
+                break;
+            case FINDRESULT:
+                findResultExecute(electionDTO, builder);
                 break;
             default:
                 // 记录异常
@@ -169,14 +181,57 @@ public class ElectionService {
         return BizResult.createSuccessResult(builder.build());
     }
 
+    /**
+     * 确认本节点是否支持发起选举
+     */
+    private void findExecute(ElectionDTOBuilder builder) {
+
+        // 返回结果的节点数
+        AtomicInteger returnNodeNum = new AtomicInteger(0);
+        // 同意选举的节点数
+        AtomicInteger voteNodeNum = new AtomicInteger(0);
+        // 收集集群中其他子节点的意见
+        sendFindResultMsg(returnNodeNum, voteNodeNum);
+
+        while (returnNodeNum.get() < (availableNodeSet.size() - 1)) {
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (voteNodeNum.get() > ((availableNodeSet.size() - 1) / 2)) {
+            // 超过一半节点同意进行选举
+            builder.voteElection(Boolean.TRUE);
+            supportLaunch = Boolean.TRUE;
+        } else {
+            // 不到一半节点同意进行选举
+            builder.voteElection(Boolean.FALSE);
+            supportLaunch = Boolean.FALSE;
+        }
+    }
+
+    /**
+     * 确认本节点的主节点心跳情况
+     */
+    private void findResultExecute(ElectionDTO electionDTO, ElectionDTOBuilder builder) {
+
+        // 返回本节点是否支持本次选举
+        if(ElectionConfig.getMasterNode().equals(electionDTO.getVoteServiceNode()) && Configuration.getSlaveNodeService().getFailNum() == 0){
+            builder.voteElection(Boolean.FALSE);
+        }else{
+            builder.voteElection(Boolean.TRUE);
+        }
+    }
 
     /**
      * 比较选举结果
      */
-    private void compareExecute(ElectionDTO electionDTO, String url, ElectionDTOBuilder builder) {
+    private void compareExecute(ElectionDTOBuilder builder) {
         // 返回本节点的选举结果
         builder.voteServiceNode(electionMasterNode);
-        log.info("本节点支持节点:{}",electionMasterNode.getUrl());
+        log.info("本节点支持节点:{}", electionMasterNode.getUrl());
     }
 
     /**
@@ -186,7 +241,7 @@ public class ElectionService {
 
         if (!electionNode.getUrl().equals(url)) {
             // 非主持节点发出的消息，不予执行
-            log.error("非主持节点发出的结束消息,不予执行.url:{}",url);
+            log.error("非主持节点发出的结束消息,不予执行.url:{}", url);
         }
 
         electionStatus = ElectionStatusEnum.FINISH;
@@ -197,7 +252,7 @@ public class ElectionService {
 
         // 广播本节点是否支持主持节点的投票结果
         sendCompareMsg(electionMasterNode, url);
-        log.info("本节点{}主持节点的选举结果", electionMasterNode.equals(electionDTO.getVoteServiceNode())?"支持":"不支持");
+        log.info("本节点{}主持节点的选举结果", electionMasterNode.equals(electionDTO.getVoteServiceNode()) ? "支持" : "不支持");
 
         while (responseNum.get() < availableNodeSet.size()) {
             try {
@@ -209,6 +264,8 @@ public class ElectionService {
 
         // 如果超过一半节点拒绝本次选举结果则将本次的主持节点踢出集群（叛徒节点）。
         if (refuseNodeSet.size() > (availableNodeSet.size() / 2)) {
+
+            ElectionConfig.setServiceNodeList(availableNodeSet);
             log.info("超过一半节点不支持本次选举结果,将主持节点{}踢出集群。", electionNode.getUrl());
             ElectionConfig.removeNode(electionNode);
 
@@ -223,13 +280,22 @@ public class ElectionService {
         log.info("成功选举出master节点:{}", electionDTO.getVoteServiceNode().getUrl());
 
         init();
+
+        ElectionConfig.setServiceNodeList(availableNodeSet);
+        if (ElectionConfig.getLocalNode().equals(electionDTO.getVoteServiceNode())) {
+            Configuration.getSlaveNodeService().stopSlaveService();
+            Configuration.getMasterNodeService().startHeartThread();
+        } else {
+            Configuration.getSlaveNodeService().startSlaveService();
+        }
+
     }
 
     /**
      * 开启选举线程
      */
     public void startElection() {
-        if(electionThread == null){
+        if (electionThread == null) {
             Thread thread = new Thread(new ElectionThread());
             electionThread = thread;
             thread.start();
@@ -276,7 +342,7 @@ public class ElectionService {
     private void voteExecute(ElectionDTO electionDTO, String url) {
 
         if (!electionNode.getUrl().equals(url)) {
-            log.error("非主持节点发出的开发投票消息,不予执行,发出节点为:{}",url);
+            log.error("非主持节点发出的开发投票消息,不予执行,发出节点为:{}", url);
             return;
         }
 
@@ -315,12 +381,12 @@ public class ElectionService {
             case VOTE:
                 break;
             default:
-                log.error("本节点状态:{},不支持接收投票消息",electionStatus);
+                log.error("本节点状态:{},不支持接收投票消息", electionStatus);
                 return;
         }
 
         if (!voteNum.equals(electionDTO.getVoteNum())) {
-            log.info("投票轮数错误,可能是过期消息,本节点轮数:{},接收消息轮数:{}",voteNum, electionDTO.getVoteNum());
+            log.info("投票轮数错误,可能是过期消息,本节点轮数:{},接收消息轮数:{}", voteNum, electionDTO.getVoteNum());
             return;
         }
 
@@ -408,7 +474,7 @@ public class ElectionService {
                             public void onFailure(Call call, IOException e) {
 
                                 // 打印异常日志
-                                log.error("发送选举信息失败,节点:{}", call.request().header("url"),e);
+                                log.error("发送选举信息失败,节点:{}", call.request().header("url"), e);
                                 checkNodeNum.incrementAndGet();
                             }
 
@@ -426,7 +492,8 @@ public class ElectionService {
                                             && electionDTO.getServiceNode().getUrl().hashCode() > ElectionConfig
                                             .getLocalNode().getUrl().hashCode()) {
                                         // 有其他优先级更高的节点发起了选举，停止本地选举线程，让出主持节点位置
-                                        log.info("存在其他优先级更高的节点发起了选举,终止本节点的主持线程.新主持节点为:{}", electionDTO.getServiceNode().getUrl());
+                                        log.info("存在其他优先级更高的节点发起了选举,终止本节点的主持线程.新主持节点为:{}",
+                                                electionDTO.getServiceNode().getUrl());
                                         electionThread.stop();
                                     }
                                 } else {
@@ -461,7 +528,7 @@ public class ElectionService {
                             @Override
                             public void onFailure(Call call, IOException e) {
                                 voteNodeNum++;
-                                log.error("发送开始投票信息失败,节点:{}",call.request().header("url"),e);
+                                log.error("发送开始投票信息失败,节点:{}", call.request().header("url"), e);
                             }
 
                             @Override
@@ -489,7 +556,7 @@ public class ElectionService {
                                 new Callback() {
                                     @Override
                                     public void onFailure(Call call, IOException e) {
-                                        log.error("发送投票信息失败,节点:{}",call.request().header("url"),e);
+                                        log.error("发送投票信息失败,节点:{}", call.request().header("url"), e);
                                     }
 
                                     @Override
@@ -515,7 +582,7 @@ public class ElectionService {
                         new Callback() {
                             @Override
                             public void onFailure(Call call, IOException e) {
-                                log.error("发送选举结果失败,节点:{}",call.request().header("url"),e);
+                                log.error("发送选举结果失败,节点:{}", call.request().header("url"), e);
                             }
 
                             @Override
@@ -540,7 +607,7 @@ public class ElectionService {
                                 new Callback() {
                                     @Override
                                     public void onFailure(Call call, IOException e) {
-                                        log.error("发送确认结果失败,节点:{}",call.request().header("url"),e);
+                                        log.error("发送确认结果失败,节点:{}", call.request().header("url"), e);
                                         responseNum.incrementAndGet();
                                     }
 
@@ -551,6 +618,71 @@ public class ElectionService {
                                         ElectionDTO electionDTO = JSON.parseObject(response.body().string(), ElectionDTO.class);
                                         if (!electionDTO.getVoteServiceNode().equals(masterNode)) {
                                             refuseNodeSet.add(ElectionConfig.getServiceNodeByUrl(url));
+                                        }
+                                    }
+                                });
+                    }
+                }
+        );
+    }
+
+    /**
+     * 发送确认是否支持选举消息
+     */
+    private void sendFindMsg(AtomicInteger findFailNodeNum, AtomicInteger returnNodeNum) {
+
+        availableNodeSet.forEach(serviceNode -> {
+                    if (!serviceNode.equals(ElectionConfig.getLocalNode()) && !serviceNode
+                            .equals(ElectionConfig.getMasterNode())) {
+                        sendElectionMsg(serviceNode,
+                                ElectionDTO.builder().status(ElectionStatusEnum.FIND.getCode())
+                                        .build(),
+                                new Callback() {
+                                    @Override
+                                    public void onFailure(Call call, IOException e) {
+                                        log.error("发送确认是否支持选举失败,节点:{}", call.request().header("url"), e);
+                                        returnNodeNum.incrementAndGet();
+                                    }
+
+                                    @Override
+                                    public void onResponse(Call call, Response response) throws IOException {
+                                        ElectionDTO electionDTO = JSON.parseObject(response.body().string(), ElectionDTO.class);
+                                        if (electionDTO.getStatus() != null && ElectionStatusEnum.CANCEL
+                                                .equals(electionDTO.getStatus())) {
+                                            findFailNodeNum.incrementAndGet();
+                                        }
+                                        returnNodeNum.incrementAndGet();
+                                    }
+                                });
+                    }
+                }
+        );
+    }
+
+    /**
+     * 发送确认主节点信息消息
+     */
+    private void sendFindResultMsg(AtomicInteger returnNodeNum, AtomicInteger voteNodeNum) {
+
+        availableNodeSet.forEach(serviceNode -> {
+                    if (!serviceNode.equals(ElectionConfig.getLocalNode())) {
+                        sendElectionMsg(serviceNode,
+                                ElectionDTO.builder().status(ElectionStatusEnum.FINDRESULT.getCode())
+                                        .voteServiceNode(electionMasterNode)
+                                        .build(),
+                                new Callback() {
+                                    @Override
+                                    public void onFailure(Call call, IOException e) {
+                                        log.error("发送确认主节点信息消息失败,节点:{}", call.request().header("url"), e);
+                                        returnNodeNum.incrementAndGet();
+                                    }
+
+                                    @Override
+                                    public void onResponse(Call call, Response response) throws IOException {
+                                        returnNodeNum.incrementAndGet();
+                                        ElectionDTO electionDTO = JSON.parseObject(response.body().string(), ElectionDTO.class);
+                                        if (electionDTO.getVoteElection()) {
+                                            voteNodeNum.incrementAndGet();
                                         }
                                     }
                                 });
@@ -604,6 +736,11 @@ public class ElectionService {
         @Override
         public void run() {
 
+            log.info("请求发起选举");
+            if (!checkSlaveNodeStatus()) {
+                return;
+            }
+
             log.info("发起选举");
             // 初始化
             init();
@@ -618,6 +755,29 @@ public class ElectionService {
 
             // 当有节点得票超过一半时，推送完成投票消息
             sendFinishMsg();
+        }
+
+        /**
+         * 检查集群中所有节点的状态，收集是否需要重新选举的信息
+         */
+        private Boolean checkSlaveNodeStatus() {
+            AtomicInteger findFailNodeNum = new AtomicInteger(0);
+            AtomicInteger returnNodeNum = new AtomicInteger(0);
+            sendFindMsg(findFailNodeNum, returnNodeNum);
+
+            while (returnNodeNum.get() < (ElectionConfig.getServiceNodeList().size() - 2)) {
+                try {
+                    Thread.sleep(50L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (findFailNodeNum.get() <= ((ElectionConfig.getServiceNodeList().size() - 1) / 2)) {
+                Configuration.getSlaveNodeService().startSlaveService();
+                return Boolean.FALSE;
+            }
+            return Boolean.TRUE;
         }
     }
 }

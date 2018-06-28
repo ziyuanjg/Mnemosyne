@@ -81,6 +81,95 @@
     </filter>
   </appender>
 
+  <!-- 选举日志 -->
+  <appender name="ELECTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/error.log</file>
+    <!-- 循环政策：基于时间创建日志文件 -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 日志命名:单个文件大于2MB 按照时间+自增i 生成log文件 -->
+      <fileNamePattern>${LOG_PATH}/election-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>${MAX_FILE_SIZE:-10MB}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- 最大保存时间：180天-->
+      <maxHistory>${MAX_HISTORY:-0}</maxHistory>
+    </rollingPolicy>
+    <append>true</append>
+    <!-- 日志格式 -->
+    <encoder>
+      <pattern>${ERROR_FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <!-- 日志级别过滤器 -->
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <!-- 过滤的级别 -->
+      <level>INFO</level>
+      <!-- 匹配时的操作：接收（记录） -->
+      <onMatch>ACCEPT</onMatch>
+      <!-- 不匹配时的操作：拒绝（不记录） -->
+      <onMismatch>DENY</onMismatch>
+    </filter>
+  </appender>
+
+  <!-- 主节点日志 -->
+  <appender name="MASTER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/error.log</file>
+    <!-- 循环政策：基于时间创建日志文件 -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 日志命名:单个文件大于2MB 按照时间+自增i 生成log文件 -->
+      <fileNamePattern>${LOG_PATH}/master-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>${MAX_FILE_SIZE:-10MB}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- 最大保存时间：180天-->
+      <maxHistory>${MAX_HISTORY:-0}</maxHistory>
+    </rollingPolicy>
+    <append>true</append>
+    <!-- 日志格式 -->
+    <encoder>
+      <pattern>${ERROR_FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <!-- 日志级别过滤器 -->
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <!-- 过滤的级别 -->
+      <level>INFO</level>
+      <!-- 匹配时的操作：接收（记录） -->
+      <onMatch>ACCEPT</onMatch>
+      <!-- 不匹配时的操作：拒绝（不记录） -->
+      <onMismatch>DENY</onMismatch>
+    </filter>
+  </appender>
+
+  <!-- 选举日志 -->
+  <appender name="SLAVE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/error.log</file>
+    <!-- 循环政策：基于时间创建日志文件 -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 日志命名:单个文件大于2MB 按照时间+自增i 生成log文件 -->
+      <fileNamePattern>${LOG_PATH}/slave-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>${MAX_FILE_SIZE:-10MB}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- 最大保存时间：180天-->
+      <maxHistory>${MAX_HISTORY:-0}</maxHistory>
+    </rollingPolicy>
+    <append>true</append>
+    <!-- 日志格式 -->
+    <encoder>
+      <pattern>${ERROR_FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <!-- 日志级别过滤器 -->
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <!-- 过滤的级别 -->
+      <level>INFO</level>
+      <!-- 匹配时的操作：接收（记录） -->
+      <onMatch>ACCEPT</onMatch>
+      <!-- 不匹配时的操作：拒绝（不记录） -->
+      <onMismatch>DENY</onMismatch>
+    </filter>
+  </appender>
 
   <logger name="default" level="INFO" additivity="false">
     <appender-ref ref="CONSOLE"/>
@@ -92,6 +181,18 @@
   </logger>
   <logger name="error" level="ERROR" additivity="false">
     <appender-ref ref="ERROR_FILE"/>
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="election" level="INFO" additivity="false">
+    <appender-ref ref="ELECTION_FILE"/>
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="master" level="INFO" additivity="false">
+    <appender-ref ref="MASTER_FILE"/>
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="slave" level="INFO" additivity="false">
+    <appender-ref ref="SLAVE_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
 

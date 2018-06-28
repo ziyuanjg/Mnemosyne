@@ -27,6 +27,32 @@ public class SlaveConfig {
     @Default
     private static Long keepAliveTime = 300L;
 
+    /**
+     * 心跳间隔时间
+     */
+    private static Long heartTime = 5000L;
+
+    /**
+     * 允许连续心跳请求连续失败的最大次数
+     */
+    private static Integer failMaxNum = 3;
+
+    public static Integer getFailMaxNum() {
+        return failMaxNum;
+    }
+
+    public static void setFailMaxNum(Integer failMaxNum) {
+        SlaveConfig.failMaxNum = failMaxNum;
+    }
+
+    public static Long getHeartTime() {
+        return heartTime;
+    }
+
+    public static void setHeartTime(Long heartTime) {
+        SlaveConfig.heartTime = heartTime;
+    }
+
     public static Integer getCorePoolSize() {
         return corePoolSize;
     }

@@ -2,12 +2,14 @@ package common;
 
 import common.httpClient.HTTPClient;
 import election.ElectionService;
+import master.MasterNodeService;
 import master.assign.AssignHandler;
 import master.assign.AssignTaskThreadPool;
 import master.assign.LoadStrategy;
 import master.assign.LoadStrategy.DefaultLoadStrategy;
 import master.receive.ReceiveTaskThreadPool;
 import slave.ExecuteTaskThreadPool;
+import slave.SlaveNodeService;
 import slave.TaskService;
 import task.TaskHandler;
 
@@ -24,6 +26,10 @@ public class Configuration {
 
     private static ElectionService electionService;
 
+    private static SlaveNodeService slaveNodeService;
+
+    private static MasterNodeService masterNodeService;
+
     private static LoadStrategy loadStrategy = new DefaultLoadStrategy();
 
     private static AssignTaskThreadPool assignTaskThreadPool;
@@ -33,6 +39,22 @@ public class Configuration {
     private static ExecuteTaskThreadPool executeTaskThreadPool;
 
     private static AssignHandler assignHandler;
+
+    public static SlaveNodeService getSlaveNodeService() {
+        return slaveNodeService;
+    }
+
+    public static void setSlaveNodeService(SlaveNodeService slaveNodeService) {
+        Configuration.slaveNodeService = slaveNodeService;
+    }
+
+    public static MasterNodeService getMasterNodeService() {
+        return masterNodeService;
+    }
+
+    public static void setMasterNodeService(MasterNodeService masterNodeService) {
+        Configuration.masterNodeService = masterNodeService;
+    }
 
     public static ElectionService getElectionService() {
         return electionService;

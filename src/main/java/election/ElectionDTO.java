@@ -31,5 +31,10 @@ public class ElectionDTO {
      */
     private Integer voteNum;
 
+    /**
+     * 是否支持开始选举
+     */
+    private Boolean voteElection;
+
 
 }
