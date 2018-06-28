@@ -1,6 +1,7 @@
 package common;
 
 import common.httpClient.HTTPClient;
+import election.ElectionService;
 import master.assign.AssignHandler;
 import master.assign.AssignTaskThreadPool;
 import master.assign.LoadStrategy;
@@ -21,6 +22,8 @@ public class Configuration {
 
     private static TaskService taskService;
 
+    private static ElectionService electionService;
+
     private static LoadStrategy loadStrategy = new DefaultLoadStrategy();
 
     private static AssignTaskThreadPool assignTaskThreadPool;
@@ -30,6 +33,14 @@ public class Configuration {
     private static ExecuteTaskThreadPool executeTaskThreadPool;
 
     private static AssignHandler assignHandler;
+
+    public static ElectionService getElectionService() {
+        return electionService;
+    }
+
+    public static void setElectionService(ElectionService electionService) {
+        Configuration.electionService = electionService;
+    }
 
     public static AssignHandler getAssignHandler() {
         return assignHandler;

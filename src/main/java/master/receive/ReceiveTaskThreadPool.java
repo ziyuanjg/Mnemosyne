@@ -63,7 +63,7 @@ public class ReceiveTaskThreadPool {
                     Task task = receiveTaskDTO.getTask();
                     ServiceNode serviceNode = receiveTaskDTO.getServiceNode();
                     HTTPClient httpClient = Configuration.getHttpClient();
-                    httpClient.send(serviceNode.getUrl(), null, task.toMap(), RequestTypeEnum.GET);
+                    httpClient.send(serviceNode.getUrl(), null, task, RequestTypeEnum.GET);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

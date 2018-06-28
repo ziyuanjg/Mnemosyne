@@ -91,7 +91,7 @@ public class ExecuteTaskThreadPool {
         private void sendFinishedTaskToMaster(HTTPClient httpClient, Task task){
 
             task.setIsFinished(Boolean.TRUE);
-            httpClient.send(ElectionConfig.getMasterNode().getUrl() + FINISHED_TASK_URL, null, task.toMap(), task.getRequestTypeEnum());
+            httpClient.send(ElectionConfig.getMasterNode().getUrl() + FINISHED_TASK_URL, null, task, task.getRequestTypeEnum());
         }
     }
 }

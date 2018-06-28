@@ -10,7 +10,7 @@ import okhttp3.Headers;
 public abstract class BaseClient implements HTTPClient {
 
     @Override
-    public String send(String url, Headers headers, Map<String, String> body, RequestTypeEnum requestTypeEnum) {
+    public String send(String url, Headers headers, Object body, RequestTypeEnum requestTypeEnum) {
 
         checkUrl(url);
 
@@ -27,8 +27,8 @@ public abstract class BaseClient implements HTTPClient {
     }
 
     @Override
-    public void sendWithCallBack(String url, Headers headers, Map<String, String> body, Callback callback,
-            RequestTypeEnum requestTypeEnum) {
+    public void sendWithCallBack(String url, Headers headers, Object body, RequestTypeEnum requestTypeEnum,
+            Callback callback) {
 
         checkUrl(url);
         switch (requestTypeEnum) {
@@ -44,11 +44,11 @@ public abstract class BaseClient implements HTTPClient {
 
     abstract String get(String url, Headers headers);
 
-    abstract String post(String url, Headers headers, Map<String, String> body);
+    abstract String post(String url, Headers headers, Object body);
 
     abstract void getWithCallBack(String url, Headers headers, Callback callback);
 
-    abstract void postWithCallBack(String url, Headers headers, Map<String, String> body, Callback callback);
+    abstract void postWithCallBack(String url, Headers headers, Object body, Callback callback);
 
     private void checkUrl(String url) {
 

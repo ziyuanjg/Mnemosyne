@@ -82,7 +82,7 @@ public class AssignTaskThreadPool {
 
                     ServiceNode serviceNode = Configuration.getLoadStrategy().getSlaveNode();
                     HTTPClient httpClient = Configuration.getHttpClient();
-                    httpClient.send(serviceNode.getUrl() + addTaskUrl, null, assignDTO.toMap(), RequestTypeEnum.POST);
+                    httpClient.send(serviceNode.getUrl() + addTaskUrl, null, assignDTO, RequestTypeEnum.POST);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -101,12 +101,12 @@ public class AssignTaskThreadPool {
             this.partition = partition;
         }
 
-        public Map toMap() {
-            Map map = new HashMap(2);
-            map.put("date", date);
-            map.put("partition", partition);
-            return map;
-        }
+//        public Map toMap() {
+//            Map map = new HashMap(2);
+//            map.put("date", date);
+//            map.put("partition", partition);
+//            return map;
+//        }
     }
 
     private class AssignTaskThread implements Runnable{
@@ -131,11 +131,11 @@ public class AssignTaskThreadPool {
                     if(task.getIsFinished()){
                         Task tasktmp = task;
                         ElectionConfig.getServiceNodeList().stream().forEach(serviceNode -> {
-                            httpClient.send(serviceNode.getUrl() + addTaskUrl, null, tasktmp.toMap(), RequestTypeEnum.POST);
+                            httpClient.send(serviceNode.getUrl() + addTaskUrl, null, tasktmp, RequestTypeEnum.POST);
                         });
                     }else {
                         ServiceNode serviceNode = Configuration.getLoadStrategy().getSlaveNode();
-                        httpClient.send(serviceNode.getUrl() + addTaskUrl, null, task.toMap(), RequestTypeEnum.POST);
+                        httpClient.send(serviceNode.getUrl() + addTaskUrl, null, task, RequestTypeEnum.POST);
                     }
                 }
             } catch (InterruptedException e) {

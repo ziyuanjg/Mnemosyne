@@ -4,6 +4,7 @@ import election.ElectionConfig;
 import election.ServiceNode;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * 负载均衡策略 Created by Mr.Luo on 2018/5/10
@@ -20,9 +21,9 @@ public interface LoadStrategy {
         @Override
         public ServiceNode getSlaveNode() {
 
-            List<ServiceNode> serviceNodeList = ElectionConfig.getServiceNodeList();
+            Set<ServiceNode> serviceNodeList = ElectionConfig.getServiceNodeList();
 
-            return serviceNodeList.get(new Random().nextInt(serviceNodeList.size() - 1));
+            return (ServiceNode) serviceNodeList.toArray()[new Random().nextInt(serviceNodeList.size())];
         }
     }
 }

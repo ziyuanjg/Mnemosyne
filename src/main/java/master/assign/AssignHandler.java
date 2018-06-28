@@ -12,6 +12,7 @@ import election.ServiceNode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import task.Task;
 import task.TaskHandler;
 
@@ -37,7 +38,7 @@ public class AssignHandler {
      */
     private void assignOldTask(Date date) {
 
-        List<ServiceNode> serviceNodeList = ElectionConfig.getServiceNodeList();
+        Set<ServiceNode> serviceNodeList = ElectionConfig.getServiceNodeList();
         List<Task> allTaskList = new ArrayList<>();
         List<Task> retainAllTaskList = new ArrayList<>();
         serviceNodeList.stream().forEach(serviceNode -> {

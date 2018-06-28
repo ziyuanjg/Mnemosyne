@@ -8,8 +8,11 @@ import common.EnumInterface;
 public enum ElectionStatusEnum implements EnumInterface {
 
     LAUNCH(0, "发起选举"),
-    VOTE(1, "投票阶段"),
-    ELECTION(2, "选举阶段");
+    VOTE(1, "发起投票"),
+    ELECTION(2, "选举"),
+    FINISH(3, "完成投票"),
+    COMPARE(4, "同步投票结果")
+    ;
 
     private Integer code;
     private String message;
@@ -22,11 +25,13 @@ public enum ElectionStatusEnum implements EnumInterface {
 
     @Override
     public Integer getCode() {
-        return null;
+        return code;
     }
 
     @Override
     public String getMessage() {
-        return null;
+        return message;
     }
+
+
 }

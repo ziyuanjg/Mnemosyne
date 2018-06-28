@@ -6,14 +6,14 @@ import lombok.Data;
  * Created by Mr.Luo on 2018/5/14
  */
 @Data
-public class BizResult {
+public class BizResult<T> {
 
     private Boolean success;
     private Integer code;
     private String msg;
-    private Object data;
+    private T data;
 
-    private BizResult(Boolean success, Integer code, String msg, Object data) {
+    private BizResult(Boolean success, Integer code, String msg, T data) {
         this.success = success;
         this.code = code;
         this.msg = msg;

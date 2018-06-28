@@ -1,6 +1,7 @@
 package election;
 
 import java.util.List;
+import java.util.Set;
 import lombok.Builder;
 
 /**
@@ -12,7 +13,7 @@ public class ElectionConfig {
     /**
      * 从节点列表
      */
-    private static List<ServiceNode> serviceNodeList;
+    private static Set<ServiceNode> serviceNodeList;
 
     /**
      * 主节点
@@ -32,11 +33,11 @@ public class ElectionConfig {
         ElectionConfig.localNode = localNode;
     }
 
-    public static List<ServiceNode> getServiceNodeList() {
+    public static Set<ServiceNode> getServiceNodeList() {
         return serviceNodeList;
     }
 
-    public static void setServiceNodeList(List<ServiceNode> serviceNodeList) {
+    public static void setServiceNodeList(Set<ServiceNode> serviceNodeList) {
         ElectionConfig.serviceNodeList = serviceNodeList;
     }
 
@@ -54,5 +55,18 @@ public class ElectionConfig {
 
     public static void removeServiceNode(ServiceNode serviceNode){
         serviceNodeList.remove(serviceNode);
+    }
+
+    public static ServiceNode getServiceNodeByUrl(String url){
+        for (ServiceNode serviceNode : serviceNodeList) {
+            if(serviceNode.getUrl().equals(url)){
+                return serviceNode;
+            }
+        }
+        return null;
+    }
+
+    public static Boolean removeNode(ServiceNode serviceNode){
+        return serviceNodeList.remove(serviceNode);
     }
 }

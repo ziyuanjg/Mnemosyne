@@ -68,18 +68,18 @@ public class Task implements Serializable {
     @Default
     private Boolean isFinished = Boolean.FALSE;
 
-    public Map<String, String> toMap() {
-        Map<String, String> map = new HashMap(10);
-        map.put("beforeTask", JSON.toJSONString(beforeTask));
-        map.put("callBackType", callBackType.getCode().toString());
-        map.put("url", url);
-        map.put("param", JSON.toJSONString(param));
-        map.put("header", JSON.toJSONString(header));
-        map.put("excuteTime", String.valueOf(excuteTime.getTime()));
-        map.put("createTime", String.valueOf(createTime.getTime()));
-        map.put("requestTypeEnum", requestTypeEnum.getCode().toString());
-        return map;
-    }
+//    public Map<String, String> toMap() {
+//        Map<String, String> map = new HashMap(10);
+//        map.put("beforeTask", JSON.toJSONString(beforeTask));
+//        map.put("callBackType", callBackType.getCode().toString());
+//        map.put("url", url);
+//        map.put("param", JSON.toJSONString(param));
+//        map.put("header", JSON.toJSONString(header));
+//        map.put("excuteTime", String.valueOf(excuteTime.getTime()));
+//        map.put("createTime", String.valueOf(createTime.getTime()));
+//        map.put("requestTypeEnum", requestTypeEnum.getCode().toString());
+//        return map;
+//    }
 
     @Override
     public boolean equals(Object o) {

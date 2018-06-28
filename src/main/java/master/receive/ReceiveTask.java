@@ -78,13 +78,13 @@ public class ReceiveTask {
 
         HTTPClient httpClient = Configuration.getHttpClient();
         String url = ElectionConfig.getMasterNode().getUrl() + RECEVE_FINISHED_TASK_URL;
-        httpClient.send(url, null, task.toMap(), RequestTypeEnum.POST);
+        httpClient.send(url, null, task, RequestTypeEnum.POST);
     }
 
     private void sendTaskToMaster(Task task) {
 
         HTTPClient httpClient = Configuration.getHttpClient();
         String url = ElectionConfig.getMasterNode().getUrl() + RECEVE_TASK_URL;
-        httpClient.send(url, null, task.toMap(), RequestTypeEnum.POST);
+        httpClient.send(url, null, task, RequestTypeEnum.POST);
     }
 }
