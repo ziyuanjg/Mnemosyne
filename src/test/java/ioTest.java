@@ -1,10 +1,10 @@
 import java.util.HashMap;
-import task.SaveConfig;
+import com.mnemosyne.task.SaveConfig;
 import java.util.Date;
 import org.junit.Test;
-import common.CallBackTypeEnum;
-import task.disk.DiskTaskHandler;
-import task.Task;
+import com.mnemosyne.common.CallBackTypeEnum;
+import com.mnemosyne.task.disk.DiskTaskHandler;
+import com.mnemosyne.task.Task;
 
 /**
  * Created by Mr.Luo on 2018/4/26

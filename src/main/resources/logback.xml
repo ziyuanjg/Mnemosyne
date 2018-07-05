@@ -87,7 +87,7 @@
     <!-- 循环政策：基于时间创建日志文件 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- 日志命名:单个文件大于2MB 按照时间+自增i 生成log文件 -->
-      <fileNamePattern>${LOG_PATH}/election-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <fileNamePattern>${LOG_PATH}/com.mnemosyne.election-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
       <timeBasedFileNamingAndTriggeringPolicy
         class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
         <maxFileSize>${MAX_FILE_SIZE:-10MB}</maxFileSize>
@@ -117,7 +117,7 @@
     <!-- 循环政策：基于时间创建日志文件 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- 日志命名:单个文件大于2MB 按照时间+自增i 生成log文件 -->
-      <fileNamePattern>${LOG_PATH}/master-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <fileNamePattern>${LOG_PATH}/com.mnemosyne.master-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
       <timeBasedFileNamingAndTriggeringPolicy
         class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
         <maxFileSize>${MAX_FILE_SIZE:-10MB}</maxFileSize>
@@ -147,7 +147,7 @@
     <!-- 循环政策：基于时间创建日志文件 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- 日志命名:单个文件大于2MB 按照时间+自增i 生成log文件 -->
-      <fileNamePattern>${LOG_PATH}/slave-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <fileNamePattern>${LOG_PATH}/com.mnemosyne.slave-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
       <timeBasedFileNamingAndTriggeringPolicy
         class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
         <maxFileSize>${MAX_FILE_SIZE:-10MB}</maxFileSize>
@@ -183,15 +183,15 @@
     <appender-ref ref="ERROR_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="election" level="INFO" additivity="false">
+  <logger name="com.mnemosyne.election" level="INFO" additivity="false">
     <appender-ref ref="ELECTION_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="master" level="INFO" additivity="false">
+  <logger name="com.mnemosyne.master" level="INFO" additivity="false">
     <appender-ref ref="MASTER_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="slave" level="INFO" additivity="false">
+  <logger name="com.mnemosyne.slave" level="INFO" additivity="false">
     <appender-ref ref="SLAVE_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>

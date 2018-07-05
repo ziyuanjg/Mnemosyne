@@ -7,12 +7,25 @@
   <groupId>com.mnemosyne</groupId>
   <artifactId>core</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
+  <name>mnemosyne</name>
 
   <properties>
     <java.encoding>UTF-8</java.encoding>
     <java.version>1.8</java.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>2.27</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -43,6 +56,16 @@
       <artifactId>powermock-module-junit4</artifactId>
       <version>1.4.11</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>javassist</artifactId>
+          <groupId>org.javassist</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
@@ -50,11 +73,11 @@
       <version>1.4.11</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>3.18.2-GA</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.javassist</groupId>-->
+      <!--<artifactId>javassist</artifactId>-->
+      <!--<version>3.18.2-GA</version>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
@@ -62,11 +85,11 @@
       <version>3.9.1</version>
     </dependency>
 
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-      <version>1.1.1</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>javax.ws.rs</groupId>-->
+      <!--<artifactId>jsr311-api</artifactId>-->
+      <!--<version>1.1.1</version>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -80,37 +103,126 @@
       <artifactId>hutool-core</artifactId>
       <version>4.0.9</version>
     </dependency>
-
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.6.1</version>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-setting</artifactId>
+      <version>4.0.9</version>
     </dependency>
 
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>1.1.7</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.5</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.1.7</version>
+      <version>1.0.13</version>
+    </dependency>
+
+    <!--<dependency>-->
+      <!--<groupId>com.sun.jersey</groupId>-->
+      <!--<artifactId>jersey-server</artifactId>-->
+      <!--<version>1.19.4</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>com.sun.jersey</groupId>-->
+      <!--<artifactId>jersey-grizzly2</artifactId>-->
+      <!--<version>1.19.4</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>com.sun.jersey</groupId>-->
+      <!--<artifactId>jersey-client</artifactId>-->
+      <!--<version>1.19.4</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>com.sun.jersey</groupId>-->
+      <!--<artifactId>jersey-bundle</artifactId>-->
+      <!--<version>1.19.4</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>javax.servlet</groupId>-->
+      <!--<artifactId>javax.servlet-api</artifactId>-->
+      <!--<version>4.0.1</version>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+      <artifactId>jersey-test-framework-provider-bundle</artifactId>
+      <type>pom</type>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>javax.servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
   </dependencies>
 
+  <!--<build>-->
+    <!--<plugins>-->
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-compiler-plugin</artifactId>-->
+        <!--<version>3.5.1</version>-->
+        <!--<configuration>-->
+          <!--<source>1.8</source>-->
+          <!--<target>1.8</target>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
+    <!--</plugins>-->
+  <!--</build>-->
   <build>
+    <finalName>mnemosyne</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>2.5.1</version>
+        <inherited>true</inherited>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeScope>compile</includeScope>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webXml>src\main\resources\web.xml</webXml>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+
+
 </project>
