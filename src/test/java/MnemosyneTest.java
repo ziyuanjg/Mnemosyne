@@ -9,7 +9,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 
 /**
- * Created by 希罗 on 2018/7/3
+ * Created by Mr.Luo on 2018/7/3
  */
 public class MnemosyneTest  extends JerseyTest{
 
@@ -22,10 +22,10 @@ public class MnemosyneTest  extends JerseyTest{
     }
 
 
-    @Override
-    protected Application configure() {
-        return new ResourceConfig(MainTest.class);
-    }
+//    @Override
+//    protected Application configure() {
+//        return new ResourceConfig(MainTest.class);
+//    }
 
     @Test
     public void jersey(){
