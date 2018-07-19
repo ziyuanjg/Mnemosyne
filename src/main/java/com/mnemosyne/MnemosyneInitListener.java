@@ -5,7 +5,7 @@ import javax.servlet.ServletContextListener;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Created by 希罗 on 2018/7/8
+ * Created by Mr.Luo on 2018/7/8
  */
 @Slf4j
 public class MnemosyneInitListener implements ServletContextListener{

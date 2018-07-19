@@ -3,7 +3,7 @@ package com.mnemosyne.task;
 import com.mnemosyne.common.EnumInterface;
 
 /**
- * Created by 希罗 on 2018/7/16
+ * Created by Mr.Luo on 2018/7/16
  */
 public enum TimeTypeEnum implements EnumInterface {
 
