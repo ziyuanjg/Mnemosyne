@@ -1,11 +1,16 @@
 package com.mnemosyne.master.receive;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.mnemosyne.common.BizResult;
 import com.mnemosyne.common.Configuration;
 import com.mnemosyne.common.httpClient.HTTPClient;
 import com.mnemosyne.common.httpClient.HTTPExceptionEnum;
 import com.mnemosyne.common.httpClient.RequestTypeEnum;
 import com.mnemosyne.election.ElectionConfig;
+import com.mnemosyne.task.TaskStatusEnum;
+import com.mnemosyne.task.disk.MainIndexConfig;
+import java.util.Collections;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -43,11 +48,21 @@ public class ReceiveTask {
             if (task.getExcuteTime().getTime() <= Configuration.getAssignHandler().getWheelTime().getTime()) {
                 Configuration.getAssignTaskThreadPool().assignTask(task);
             }
+
+            // 添加任务依赖
+            if(task.getWaitTaskId() != null){
+                Task waitTask = Configuration.getTaskHandler().getTaskById(task.getWaitTaskId());
+                if(waitTask != null){
+                    waitTask.getPostpositivelyTaskIdList().add(waitTask.getId());
+                    ElectionConfig.getServiceNodeList().stream()
+                            .forEach(serviceNode -> Configuration.getReceiveTaskThreadPool().receiveTask(task, serviceNode));
+                }
+            }
         } else {
             // 子节点将任务转发给主节点，主要为了防止误请求到子节点。
             sendTaskToMaster(task);
         }
-
+// TODO 在什么地方添加任务执行中状态？申请的任务如果在执行中需保证不会二次执行
         return BizResult.createSuccessResult(null);
     }
 
@@ -63,7 +78,7 @@ public class ReceiveTask {
             return BizResult.createErrorResult(HTTPExceptionEnum.PARAM_ERROR_URL);
         }
 
-        task.setIsFinished(Boolean.TRUE);
+        task.finish();
 
         // 只有主节点才可以接收任务
         if (ElectionConfig.getMasterNode().equals(ElectionConfig.getLocalNode())) {
@@ -73,6 +88,31 @@ public class ReceiveTask {
             sendFinishedTaskToMaster(task);
         }
 
+        return BizResult.createSuccessResult(null);
+    }
+
+    /**
+     * 接收未完成任务信息，校验任务执行情况，如果已过执行时间则立即执行
+     */
+    @Path("receveUnfinishedTask")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public BizResult receveUnfinishedTask(List<Long> taskIdList){
+
+        if(CollectionUtil.isEmpty(taskIdList)){
+            return BizResult.createErrorResult(HTTPExceptionEnum.PARAM_ERROR_URL);
+        }
+
+        taskIdList.forEach(taskId -> {
+            Task task = Configuration.getTaskHandler().getTaskById(taskId);
+            if(task != null){
+                if(task.getExcuteTime().getTime() < Configuration.getAssignHandler().getWheelTime().getTime()
+                        && TaskStatusEnum.WAIT_RUN_STATUS.equals(task.getTaskStatusEnum())){
+                    // 已过执行时间且为待执行状态
+                    Configuration.getAssignTaskThreadPool().assignTask(task);
+                }
+            }
+        });
         return BizResult.createSuccessResult(null);
     }
 

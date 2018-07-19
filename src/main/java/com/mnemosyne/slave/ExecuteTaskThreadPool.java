@@ -1,12 +1,19 @@
 package com.mnemosyne.slave;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.mnemosyne.common.Configuration;
 import com.mnemosyne.common.httpClient.HTTPClient;
+import com.mnemosyne.common.httpClient.RequestTypeEnum;
 import com.mnemosyne.election.ElectionConfig;
+import com.mnemosyne.task.TaskStatusEnum;
+import com.mnemosyne.task.disk.FileUtil;
+import com.mnemosyne.task.disk.MainIndex;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import okhttp3.Headers.Builder;
 import com.mnemosyne.task.Task;
@@ -15,6 +22,7 @@ import com.mnemosyne.task.TaskHandler;
 /**
  * Created by Mr.Luo on 2018/5/9
  */
+@Slf4j(topic = "task")
 public class ExecuteTaskThreadPool {
 
 
@@ -48,6 +56,9 @@ public class ExecuteTaskThreadPool {
 
         private final String FINISHED_TASK_URL = "receve/receveFinishedTask/";
 
+        private final String UNFINISHED_TASK_URL = "receve/receveUnfinishedTask/";
+
+
         TaskThread(LinkedBlockingQueue<Task> taskQueue) {
             this.taskQueue = taskQueue;
         }
@@ -63,6 +74,29 @@ public class ExecuteTaskThreadPool {
 
                     if ((task = taskQueue.take()) != null) {
 
+                        if(task.isFinish()){
+                            // 已经执行完毕
+                            continue;
+                        }
+
+                        if(task.isPause()){
+                            // 已暂停
+                            continue;
+                        }
+
+                        Long waitTaskId;
+                        if((waitTaskId = task.getWaitTaskId()) != null){
+                            // TODO 需判断前置任务是否完成
+                            Task waitTask = Configuration.getTaskHandler().getTaskById(waitTaskId);
+                            if(waitTask == null){
+                                log.error("前置任务不存在,执行任务id:{},前置任务id:{}", task.getId(), waitTaskId);
+                            } else if(!waitTask.isFinish()){
+                                log.error("前置任务未完成,执行任务id:{},前置任务id:{}", task.getId(), waitTaskId);
+                                sendUnFinishedTaskToMaster(CollectionUtil.newArrayList(waitTask.getId()));
+                                continue;
+                            }
+                        }
+
                         HTTPClient httpClient = Configuration.getHttpClient();
                         Headers headers = null;
                         if (task.getHeader() != null) {
@@ -75,11 +109,15 @@ public class ExecuteTaskThreadPool {
 
                         httpClient.send(task.getUrl(), headers, task.getParam(), task.getRequestTypeEnum());
 
-                        task.setIsFinished(Boolean.TRUE);
+                        task.finish();
                         TaskHandler taskHandler = Configuration.getTaskHandler();
                         taskHandler.saveTask(task);
 
-                        sendFinishedTaskToMaster(httpClient, task);
+                        sendFinishedTaskToMaster(task);
+
+                        if(!CollectionUtil.isEmpty(task.getPostpositivelyTaskIdList())){
+                            sendUnFinishedTaskToMaster(task.getPostpositivelyTaskIdList());
+                        }
                     }
 
                 } catch (InterruptedException e) {
@@ -88,10 +126,15 @@ public class ExecuteTaskThreadPool {
             }
         }
 
-        private void sendFinishedTaskToMaster(HTTPClient httpClient, Task task){
+        private void sendFinishedTaskToMaster(Task task){
 
-            task.setIsFinished(Boolean.TRUE);
-            httpClient.send(ElectionConfig.getMasterNode().getUrl() + FINISHED_TASK_URL, null, task, task.getRequestTypeEnum());
+            task.finish();
+            Configuration.getHttpClient().send(ElectionConfig.getMasterNode().getUrl() + FINISHED_TASK_URL, null, task, RequestTypeEnum.POST);
+        }
+
+        private void sendUnFinishedTaskToMaster(List<Long> taskIdList){
+
+            Configuration.getHttpClient().send(ElectionConfig.getMasterNode().getUrl() + UNFINISHED_TASK_URL, null, taskIdList, RequestTypeEnum.POST);
         }
     }
 }

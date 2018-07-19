@@ -24,6 +24,7 @@
     <!-- 日志格式 -->
     <encoder>
       <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
     </encoder>
   </appender>
 
@@ -45,6 +46,7 @@
     <!-- 日志格式 -->
     <encoder>
       <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
     </encoder>
   </appender>
 
@@ -66,6 +68,7 @@
     <!-- 日志格式 -->
     <encoder>
       <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
     </encoder>
   </appender>
 
@@ -87,6 +90,7 @@
     <!-- 日志格式 -->
     <encoder>
       <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
     </encoder>
   </appender>
 
@@ -108,6 +112,29 @@
     <!-- 日志格式 -->
     <encoder>
       <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <!-- 任务日志 -->
+  <appender name="TASK_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/task.log</file>
+    <!-- 循环政策：基于时间创建日志文件 -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 日志命名:单个文件大于2MB 按照时间+自增i 生成log文件 -->
+      <fileNamePattern>${LOG_PATH}/task-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>${MAX_FILE_SIZE:-10MB}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- 最大保存时间：180天-->
+      <maxHistory>${MAX_HISTORY:-0}</maxHistory>
+    </rollingPolicy>
+    <append>true</append>
+    <!-- 日志格式 -->
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
     </encoder>
   </appender>
 
@@ -128,6 +155,10 @@
   </logger>
   <logger name="slave" level="INFO" additivity="false">
     <appender-ref ref="SLAVE_FILE"/>
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger name="task" level="INFO" additivity="false">
+    <appender-ref ref="TASK_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
 

@@ -9,6 +9,7 @@ import com.mnemosyne.common.httpClient.HTTPClient;
 import com.mnemosyne.common.httpClient.RequestTypeEnum;
 import com.mnemosyne.election.ElectionConfig;
 import com.mnemosyne.election.ServiceNode;
+import com.mnemosyne.task.TaskStatusEnum;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -78,7 +79,7 @@ public class AssignHandler {
         // 取未执行任务和全部任务的差集，分发给子节点，刷新执行状态
         allTaskList.removeAll(retainAllTaskList);
         allTaskList.stream().forEach(task -> {
-            task.setIsFinished(Boolean.TRUE);
+            task.finish();
             Configuration.getAssignTaskThreadPool().assignTask(task);
         });
     }

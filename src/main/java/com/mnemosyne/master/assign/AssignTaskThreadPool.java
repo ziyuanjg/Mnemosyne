@@ -5,6 +5,7 @@ import com.mnemosyne.common.httpClient.HTTPClient;
 import com.mnemosyne.common.httpClient.RequestTypeEnum;
 import com.mnemosyne.election.ElectionConfig;
 import com.mnemosyne.election.ServiceNode;
+import com.mnemosyne.task.TaskStatusEnum;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -120,7 +121,7 @@ public class AssignTaskThreadPool {
                 while ((task = assignTaskQueue.take()) != null && Configuration.getMasterNodeService().getMaster()) {
 
                     HTTPClient httpClient = Configuration.getHttpClient();
-                    if (task.getIsFinished()) {
+                    if (task.isFinish()) {
                         Task tasktmp = task;
                         ElectionConfig.getServiceNodeList().stream().forEach(serviceNode -> {
                             httpClient.send(serviceNode.getUrl() + EXECUTE_BY_TASK_URL, null, tasktmp,

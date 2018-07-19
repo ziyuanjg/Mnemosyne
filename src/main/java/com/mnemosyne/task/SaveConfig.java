@@ -48,7 +48,7 @@ public class SaveConfig {
      * 每个分区的任务数
      */
     @Default
-    private static Integer taskNumOfPartition = 1000 * 5;
+    private static Integer taskNumOfPartition = 1000;
 
     public static Integer getTaskNumOfPartition() {
         return taskNumOfPartition;

@@ -19,28 +19,23 @@ public class FileConfig {
     private Integer taskMAXLength;
 
     /**
-     * 此分片数据的起始id
+     * 此分片任务数
      */
-    private Integer startId;
-
-    /**
-     * 此分片数据的结束id
-     */
-    private AtomicInteger endId;
+    private AtomicInteger taskNum;
 
     /**
      * 此分片已经完成的任务数
      */
-    private AtomicInteger finishedTask;
+    private AtomicInteger finishedTaskNum;
 
 
     public Boolean isFinish(){
 
-        if(startId == null || endId == null || finishedTask == null){
+        if(taskNum == null || finishedTaskNum == null){
             return Boolean.FALSE;
         }
 
-        if(finishedTask.get() == (endId.get() - startId + 1)){
+        if(finishedTaskNum.get() == taskNum.get()){
             return Boolean.TRUE;
         }
 
@@ -48,14 +43,14 @@ public class FileConfig {
     }
 
     public void addTaskNum(){
-        endId.incrementAndGet();
+        taskNum.incrementAndGet();
     }
 
     public void addFinishedTaskNum(){
-        finishedTask.incrementAndGet();
+        finishedTaskNum.incrementAndGet();
     }
 
     public Integer getEndTaskId(){
-        return endId.get();
+        return taskNum.get();
     }
 }

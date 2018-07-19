@@ -22,7 +22,7 @@ public abstract class AbstractTaskHandler implements TaskHandler {
     public Boolean saveTask(Task task) {
 
         try {
-            Future<Boolean> future = savePool.submit(() -> save(task));
+            Future<Boolean> future = savePool.submit(() -> _save(task));
             return future.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -37,7 +37,7 @@ public abstract class AbstractTaskHandler implements TaskHandler {
     public Task getTask(Date date, Integer partition) {
 
         try {
-            Future<Task> future = getPool.submit(() -> get(date, partition));
+            Future<Task> future = getPool.submit(() -> _get(date, partition));
             return future.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -51,21 +51,37 @@ public abstract class AbstractTaskHandler implements TaskHandler {
     @Override
     public Integer getPartitionCount(Date date) {
 
-        return getPartitionNum(date);
+        return _getPartitionCount(date);
     }
 
     @Override
     public List<Task> getUnFinishedTaskIdList(Date date) {
 
-        return getUnFinishedTaskIds(date);
+        return _getUnFinishedTaskIdList(date);
     }
 
-    protected abstract List<Task> getUnFinishedTaskIds(Date date);
+    @Override
+    public Task getTaskById(Long id) {
 
-    protected abstract Integer getPartitionNum(Date date);
+        return _getTaskById(id);
+    }
 
-    protected abstract Boolean save(Task task);
+    @Override
+    public Long getNewTaskId() {
 
-    protected abstract Task get(Date date, Integer partition);
+        return _getNewTaskId();
+    }
+
+    protected abstract List<Task> _getUnFinishedTaskIdList(Date date);
+
+    protected abstract Integer _getPartitionCount(Date date);
+
+    protected abstract Boolean _save(Task task);
+
+    protected abstract Task _get(Date date, Integer partition);
+
+    protected abstract Task _getTaskById(Long id);
+
+    protected abstract Long _getNewTaskId();
 
 }

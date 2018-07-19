@@ -28,5 +28,15 @@ public interface TaskHandler {
      */
     List<Task> getUnFinishedTaskIdList(Date date);
 
+    /**
+     * 根据id获取任务
+     */
+    Task getTaskById(Long id);
+
+    /**
+     * 获取新任务id
+     */
+    Long getNewTaskId();
+
 
 }

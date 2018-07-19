@@ -1,6 +1,5 @@
 import static org.junit.Assert.assertEquals;
 
-import com.mnemosyne.MainTest;
 import com.mnemosyne.Mnemosyne;
 import com.mnemosyne.slave.SlaveNodeService;
 import javax.ws.rs.core.Application;

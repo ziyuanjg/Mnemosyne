@@ -18,7 +18,7 @@ public class ServiceNode {
     }
 
     public ServiceNode(String url) {
-        this.url = url;
+        this.url = url + ":8080";
         this.isMaster = Boolean.FALSE;
     }
 

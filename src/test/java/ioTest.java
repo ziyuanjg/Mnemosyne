@@ -1,6 +1,9 @@
+import com.alibaba.fastjson.JSON;
+import com.mnemosyne.task.disk.MainIndex;
 import java.util.HashMap;
 import com.mnemosyne.task.SaveConfig;
 import java.util.Date;
+import lombok.Data;
 import org.junit.Test;
 import com.mnemosyne.common.CallBackTypeEnum;
 import com.mnemosyne.task.disk.DiskTaskHandler;
@@ -37,4 +40,8 @@ public class ioTest {
 
         System.out.println("读取花费"+(System.currentTimeMillis() - time2)+"ms");
     }
+
+    // TODO 任务依赖，如果后面任务依赖前面任务，这个可能需要一些措施来暂停后置任务的执行
+
+    // TODO 任务暂停，暂定可以依靠id，需加一个状态
 }

@@ -3,7 +3,9 @@ package com.mnemosyne.task;
 import com.mnemosyne.common.CallBackTypeEnum;
 import com.mnemosyne.common.httpClient.RequestTypeEnum;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +20,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class Task implements Serializable {
 
-    private Integer id;
+    private Long id;
 
     /**
      * 链路上级任务
@@ -61,10 +63,66 @@ public class Task implements Serializable {
     private RequestTypeEnum requestTypeEnum;
 
     /**
-     * 是否已执行
+     * 前置任务id
+     */
+    private Long waitTaskId;
+
+    /**
+     * 定时类型
+     */
+    private TimeTypeEnum timeTypeEnum;
+
+    /**
+     * 任务执行间隔时间
+     */
+    private Integer interval;
+
+    /**
+     * 后置任务id集合
+     */
+    private List<Long> postpositivelyTaskIdList;
+
+    /**
+     * 任务状态
      */
     @Default
-    private Boolean isFinished = Boolean.FALSE;
+    private TaskStatusEnum taskStatusEnum = TaskStatusEnum.WAIT_RUN_STATUS;
+
+    public void finish(){
+        this.taskStatusEnum = TaskStatusEnum.FINISH_STATUS;
+    }
+
+    public void cancel(){
+        this.taskStatusEnum = TaskStatusEnum.CANCEL_STATUS;
+    }
+
+    public void pause(){
+        this.taskStatusEnum = TaskStatusEnum.PAUSE_STATUS;
+    }
+
+    public Boolean isFinish(){
+        return TaskStatusEnum.FINISH_STATUS.equals(this.taskStatusEnum);
+    }
+
+    public Boolean isCancel(){
+        return TaskStatusEnum.CANCEL_STATUS.equals(this.taskStatusEnum);
+    }
+
+    public Boolean isPause(){
+        return TaskStatusEnum.PAUSE_STATUS.equals(this.taskStatusEnum);
+    }
+
+    public List<Long> getPostpositivelyTaskIdList() {
+
+        if(postpositivelyTaskIdList == null){
+            synchronized (id){
+                if(postpositivelyTaskIdList == null){
+                    postpositivelyTaskIdList = new ArrayList<>(1);
+                }
+            }
+        }
+        return postpositivelyTaskIdList;
+    }
 
     @Override
     public boolean equals(Object o) {

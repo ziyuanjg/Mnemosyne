@@ -3,6 +3,7 @@ package com.mnemosyne.master;
 import com.mnemosyne.common.BizResult;
 import com.mnemosyne.election.ElectionConfig;
 import com.mnemosyne.election.ServiceNode;
+import com.mnemosyne.task.disk.MainIndexConfig;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;

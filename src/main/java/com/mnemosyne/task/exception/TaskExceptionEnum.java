@@ -15,6 +15,11 @@ public enum TaskExceptionEnum implements EnumInterface {
     FILE_TASK_ERROR(1006, "读取任务失败"),
     FILE_MAINCONFIG_WRITE_ERROR(1007, "写入主配置失败"),
     FILE_MAINCONFIG_READ_ERROR(1008, "读取主配置失败"),
+    FILE_GET_MAIN_INDEX_CONFIG_ERROR(1009, "读取主索引配置信息失败"),
+    FILE_SET_MAIN_INDEX_CONFIG_ERROR(1010, "写入主索引配置信息失败"),
+    FILE_GET_MAIN_INDEX_ERROR(1010, "写入主索引信息失败"),
+    FILE_SET_MAIN_INDEX_ERROR(1010, "写入主索引信息失败"),
+
 
     PARAM_ERROR_PARTITION(1050, "缺少分区参数"),
     PARAM_ERROR_DATE(1051, "缺少日期参数")

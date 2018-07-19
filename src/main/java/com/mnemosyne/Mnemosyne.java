@@ -19,10 +19,12 @@ import com.mnemosyne.slave.SlaveNodeService;
 import com.mnemosyne.task.SaveConfig;
 import com.mnemosyne.task.SaveTypeEnum;
 import com.mnemosyne.task.disk.DiskTaskHandler;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by Mr.Luo on 2018/5/22
  */
+@Slf4j
 public class Mnemosyne {
 
     /**
@@ -40,12 +42,15 @@ public class Mnemosyne {
 
         // 持久化配置
         saveConfig();
+        log.info("持久化配置完毕");
 
         // 子节点配置
         slaveConfig();
+        log.info("子节点配置完毕");
 
         // 主节点配置
         masterConfig();
+        log.info("主节点配置完毕");
 
         // 选举配置
         Configuration.setElectionService(new ElectionService());
@@ -64,6 +69,7 @@ public class Mnemosyne {
         String masterUrl = props.getStr("com.mnemosyne.master.url");
         if (masterUrl == null) {
 
+            log.info("本节点担任主节点");
             // 本节点担任主节点职责
             ElectionConfig.getLocalNode().setIsMaster(Boolean.TRUE);
             ElectionConfig.setMasterNode(ElectionConfig.getLocalNode());
@@ -77,13 +83,17 @@ public class Mnemosyne {
             // 开启分配任务线程
             Configuration.getAssignHandler().startAssignThread();
 
+            log.info("主节点线程池开启完毕");
         } else {
+
+            log.info("本节点担任子节点");
             // 本节点担任子节点职责
             ServiceNode masterNode = new ServiceNode(masterUrl);
             ElectionConfig.setMasterNode(masterNode);
 
             // 开启子节点主线程
             Configuration.getSlaveNodeService().startSlaveService();
+            log.info("子节点线程池开启完毕");
         }
     }
 

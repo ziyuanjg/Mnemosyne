@@ -13,6 +13,7 @@ import com.mnemosyne.task.SaveConfig;
 import com.mnemosyne.task.Task;
 import com.mnemosyne.task.exception.FileException;
 import com.mnemosyne.task.exception.TaskExceptionEnum;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 小文件分片持久化任务 Created by Mr.Luo on 2018/4/28
@@ -26,15 +27,16 @@ public class DiskTaskHandler extends AbstractTaskHandler {
 
     private final MainConfig mainConfig = fileUtil.getMainConfig();
 
+    private final MainIndexConfig mainIndexConfig = fileUtil.getMainIndexConfig();
 
     @Override
-    protected Boolean save(Task task) {
+    protected Boolean _save(Task task) {
 
         if (task == null) {
             return Boolean.FALSE;
         }
 
-        if (task.getIsFinished()) {
+        if (task.isFinish()) {
             saveFinishedTask(task);
         } else {
             saveUnfinishedTask(task);
@@ -62,22 +64,15 @@ public class DiskTaskHandler extends AbstractTaskHandler {
 
         } while (file.exists() && file.length() > FILE_MAX_LENGTH);
 
-        try {
-            fileUtil.getFileLock(fileName);
-            fileUtil.SaveTaskToFile(task, file, fileNum, null);
+        fileUtil.SaveTaskToFile(task, file,null);
 
-            FileConfig fileConfig = fileUtil.getFileConfig(file);
+        FileConfig fileConfig = fileUtil.getFileConfig(file);
+        fileConfig.addTaskNum();
 
-            fileConfig.addTaskNum();
-            fileUtil.setFileConfig(file, fileConfig);
+        fileUtil.setFileConfig(file, fileConfig);
 
-            mainConfig.getTaskCount().incrementAndGet();
-            fileUtil.setMainConfig(mainConfig);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            fileUtil.releaseFileLock(fileName);
-        }
+        mainConfig.getTaskCount().incrementAndGet();
+        fileUtil.setMainConfig(mainConfig);
     }
 
     /**
@@ -85,10 +80,10 @@ public class DiskTaskHandler extends AbstractTaskHandler {
      * @param task
      */
     private void saveFinishedTask(Task task) {
-        Integer id = task.getId();
+        Long id = task.getId();
         File file;
         String fileName;
-        Integer fileNum;
+        Long fileNum;
         DateTime excuteTime = DateUtil.date(task.getExcuteTime());
         String taskDate = DateUtil.formatDateTime(task.getExcuteTime());
         if (id % SaveConfig.getTaskNumOfPartition() > 0) {
@@ -106,45 +101,32 @@ public class DiskTaskHandler extends AbstractTaskHandler {
         }
 
         FileConfig fileConfig = fileUtil.getFileConfig(file);
-        if (fileConfig.getStartId() > task.getId() || (fileConfig.getStartId() + SaveConfig.getTaskNumOfPartition()) < task.getId()) {
-            throw new FileException(TaskExceptionEnum.FILE_PARTITION_ERROR);
+
+        // 先根据索引获取任务在文件中的位置
+        MainIndex mainIndex = fileUtil.getMainIndex(task.getId());
+
+        Long startIndex = mainIndex.getFileIndex();
+
+        fileUtil.SaveTaskToFile(task, file, startIndex);
+
+        fileConfig.addFinishedTaskNum();
+        fileUtil.setFileConfig(file, fileConfig);
+
+        // 此分片全部任务都已经执行完毕,刷新主体中的最后全部执行完毕的分片
+        if(fileConfig.getFinishedTaskNum().get() == fileConfig.getTaskNum().get()){
+            if(mainConfig == null || mainConfig.getFinishedAllTaskLastDate().getTime() < excuteTime.getTime()){
+                mainConfig.setFinishedAllTaskLastDate(excuteTime);
+            }
         }
 
-        Long startIndex =
-                FileUtil.FILE_CONFIG_LENGTH.longValue() + ((task.getId() - fileConfig.getStartId()) * SaveConfig
-                        .getTaskMAXLength());
+        // 更新主体信息
+        finishTaskNote(task);
 
-        try {
-            fileUtil.getFileLock(fileName);
-            fileUtil.SaveTaskToFile(task, file, fileNum, startIndex);
-
-            fileConfig.addFinishedTaskNum();
-            fileUtil.setFileConfig(file, fileConfig);
-
-            // 此分片全部任务都已经执行完毕,刷新主体中的最后全部执行完毕的分片
-            if(fileConfig.getFinishedTask().get() == (fileConfig.getEndTaskId() - fileConfig.getStartId() + 1)){
-                if(mainConfig == null || mainConfig.getFinishedAllTaskLastDate().getTime() < excuteTime.getTime()){
-                    mainConfig.setFinishedAllTaskLastDate(excuteTime);
-                }
-            }
-
-            // 更新主体信息
-            if(mainConfig.getFinishedLastDate() == null || task.getExcuteTime().getTime() > mainConfig.getFinishedLastDate().getTime()){
-                mainConfig.setFinishedLastDate(task.getExcuteTime());
-            }
-
-            mainConfig.getFinishedTaskCount().incrementAndGet();
-
-            fileUtil.setMainConfig(mainConfig);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            fileUtil.releaseFileLock(fileName);
-        }
+        fileUtil.setMainConfig(mainConfig);
     }
 
     @Override
-    protected Task get(Date date, Integer partition) {
+    protected Task _get(Date date, Integer partition) {
 
         if (date == null) {
             throw new FileException(TaskExceptionEnum.PARAM_ERROR_DATE);
@@ -180,7 +162,7 @@ public class DiskTaskHandler extends AbstractTaskHandler {
     }
 
     @Override
-    protected Integer getPartitionNum(Date date) {
+    protected Integer _getPartitionCount(Date date) {
 
         DateTime excuteTime = DateUtil.date(date);
         String filePath = fileUtil.getFilePath(excuteTime);
@@ -195,11 +177,11 @@ public class DiskTaskHandler extends AbstractTaskHandler {
     }
 
     @Override
-    protected List<Task> getUnFinishedTaskIds(Date date) {
+    protected List<Task> _getUnFinishedTaskIdList(Date date) {
 
         Date lastRunDate = mainConfig.getFinishedLastDate();
 
-        if(lastRunDate.getTime() >= date.getTime()){
+        if(lastRunDate != null && lastRunDate.getTime() >= date.getTime()){
             return new ArrayList<Task>(0);
         }
 
@@ -221,7 +203,7 @@ public class DiskTaskHandler extends AbstractTaskHandler {
                     if(task != null){
                         do {
 
-                            if(!task.getIsFinished()){
+                            if(!task.isFinish()){
                                 taskList.add(task);
                             }
                         } while((task = task.getBeforeTask()) != null);
@@ -235,12 +217,27 @@ public class DiskTaskHandler extends AbstractTaskHandler {
         return taskList;
     }
 
+    @Override
+    protected Task _getTaskById(Long id) {
+
+        // TODO 如何根据id快读获取任务地址？
+        return null;
+    }
+
+    @Override
+    protected Long _getNewTaskId() {
+        return mainIndexConfig.getEndId() + 1;
+    }
+
     public void finishTaskNote(Task task){
 
         if(mainConfig.getFinishedLastDate() == null || task.getExcuteTime().getTime() > mainConfig.getFinishedLastDate().getTime()){
             mainConfig.setFinishedLastDate(task.getExcuteTime());
         }
 
+        if(mainConfig.getFinishedTaskCount() == null){
+            mainConfig.setFinishedTaskCount(new AtomicLong(0));
+        }
         mainConfig.getFinishedTaskCount().incrementAndGet();
     }
 }
