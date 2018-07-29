@@ -19,6 +19,11 @@ public class MainIndex {
     private Date excuteTime;
 
     /**
+     * 所在分区
+     */
+    private Integer partation;
+
+    /**
      * 任务在文件中的位置
      */
     private Long fileIndex;

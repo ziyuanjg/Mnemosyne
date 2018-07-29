@@ -64,7 +64,7 @@ public class DiskTaskHandler extends AbstractTaskHandler {
 
         } while (file.exists() && file.length() > FILE_MAX_LENGTH);
 
-        fileUtil.SaveTaskToFile(task, file,null);
+        fileUtil.SaveTaskToFile(task, file,null, fileNum, Boolean.TRUE);
 
         FileConfig fileConfig = fileUtil.getFileConfig(file);
         fileConfig.addTaskNum();
@@ -80,34 +80,20 @@ public class DiskTaskHandler extends AbstractTaskHandler {
      * @param task
      */
     private void saveFinishedTask(Task task) {
-        Long id = task.getId();
-        File file;
-        String fileName;
-        Long fileNum;
-        DateTime excuteTime = DateUtil.date(task.getExcuteTime());
-        String taskDate = DateUtil.formatDateTime(task.getExcuteTime());
-        if (id % SaveConfig.getTaskNumOfPartition() > 0) {
-
-            fileNum = id / SaveConfig.getTaskNumOfPartition();
-            fileName = taskDate + "." + fileNum;
-            String filePath = fileUtil.getFilePath(excuteTime);
-            file = new File(filePath + fileName);
-        } else {
-
-            fileNum = (id / SaveConfig.getTaskNumOfPartition()) - 1;
-            fileName = taskDate + "." + fileNum;
-            String filePath = fileUtil.getFilePath(excuteTime);
-            file = new File(filePath + fileName);
-        }
-
-        FileConfig fileConfig = fileUtil.getFileConfig(file);
 
         // 先根据索引获取任务在文件中的位置
         MainIndex mainIndex = fileUtil.getMainIndex(task.getId());
 
+        DateTime excuteTime = DateUtil.date(mainIndex.getExcuteTime());
+        String taskDate = DateUtil.formatDateTime(mainIndex.getExcuteTime());
+        String fileName = taskDate + "." + mainIndex.getPartation();
+        File file = new File(fileUtil.getFilePath(excuteTime) + fileName);
+
+        FileConfig fileConfig = fileUtil.getFileConfig(file);
+
         Long startIndex = mainIndex.getFileIndex();
 
-        fileUtil.SaveTaskToFile(task, file, startIndex);
+        fileUtil.SaveTaskToFile(task, file, startIndex, null, Boolean.FALSE);
 
         fileConfig.addFinishedTaskNum();
         fileUtil.setFileConfig(file, fileConfig);
@@ -220,8 +206,17 @@ public class DiskTaskHandler extends AbstractTaskHandler {
     @Override
     protected Task _getTaskById(Long id) {
 
-        // TODO 如何根据id快读获取任务地址？
-        return null;
+        MainIndex mainIndex = fileUtil.getMainIndex(id);
+        if(mainIndex == null){
+            return null;
+        }
+
+        DateTime excuteTime = DateUtil.date(mainIndex.getExcuteTime());
+        String taskDate = DateUtil.formatDateTime(mainIndex.getExcuteTime());
+        String fileName = taskDate + "." + mainIndex.getPartation();
+        File file = new File(fileUtil.getFilePath(excuteTime) + fileName);
+
+        return fileUtil.getTask(file, mainIndex.getFileIndex());
     }
 
     @Override

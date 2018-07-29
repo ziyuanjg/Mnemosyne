@@ -86,7 +86,7 @@ public class ExecuteTaskThreadPool {
 
                         Long waitTaskId;
                         if((waitTaskId = task.getWaitTaskId()) != null){
-                            // TODO 需判断前置任务是否完成
+                            // 需判断前置任务是否完成
                             Task waitTask = Configuration.getTaskHandler().getTaskById(waitTaskId);
                             if(waitTask == null){
                                 log.error("前置任务不存在,执行任务id:{},前置任务id:{}", task.getId(), waitTaskId);

@@ -67,15 +67,15 @@ public class Task implements Serializable {
      */
     private Long waitTaskId;
 
-    /**
-     * 定时类型
-     */
-    private TimeTypeEnum timeTypeEnum;
-
-    /**
-     * 任务执行间隔时间
-     */
-    private Integer interval;
+//    /**
+//     * 定时类型
+//     */
+//    private TimeTypeEnum timeTypeEnum;
+//
+//    /**
+//     * 任务执行间隔时间
+//     */
+//    private Integer interval;
 
     /**
      * 后置任务id集合

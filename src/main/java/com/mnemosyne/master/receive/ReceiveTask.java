@@ -53,16 +53,16 @@ public class ReceiveTask {
             if(task.getWaitTaskId() != null){
                 Task waitTask = Configuration.getTaskHandler().getTaskById(task.getWaitTaskId());
                 if(waitTask != null){
-                    waitTask.getPostpositivelyTaskIdList().add(waitTask.getId());
+                    waitTask.getPostpositivelyTaskIdList().add(task.getId());
                     ElectionConfig.getServiceNodeList().stream()
-                            .forEach(serviceNode -> Configuration.getReceiveTaskThreadPool().receiveTask(task, serviceNode));
+                            .forEach(serviceNode -> Configuration.getReceiveTaskThreadPool().receiveTask(waitTask, serviceNode));
                 }
             }
         } else {
             // 子节点将任务转发给主节点，主要为了防止误请求到子节点。
             sendTaskToMaster(task);
         }
-// TODO 在什么地方添加任务执行中状态？申请的任务如果在执行中需保证不会二次执行
+        // TODO 在什么地方添加任务执行中状态？申请的任务如果在执行中需保证不会二次执行
         return BizResult.createSuccessResult(null);
     }
 
@@ -83,6 +83,11 @@ public class ReceiveTask {
         // 只有主节点才可以接收任务
         if (ElectionConfig.getMasterNode().equals(ElectionConfig.getLocalNode())) {
             Configuration.getAssignTaskThreadPool().assignTask(task);
+
+            // TODO 启动后续任务 需过滤执行中和未到时间任务
+            if(CollectionUtil.isEmpty(task.getPostpositivelyTaskIdList())){
+
+            }
         } else {
             // 子节点将任务转发给主节点，主要为了防止误请求到子节点。
             sendFinishedTaskToMaster(task);

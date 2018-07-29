@@ -154,7 +154,7 @@ public class FileUtil {
     /**
      * 将任务持久化到磁盘文件
      */
-    public void SaveTaskToFile(Task task, File file, Long startIndex) {
+    public void SaveTaskToFile(Task task, File file, Long startIndex, Integer partation, Boolean addIndex) {
 
         if (!file.getParentFile().exists()) {
             try {
@@ -171,7 +171,9 @@ public class FileUtil {
         try {
             getFileLock(file.getName());
             startIndex = writeToFile(file, JSON.toJSONBytes(task), SaveConfig.getTaskMAXLength(), startIndex);
-            addMainIndex(task.getId(), task.getExcuteTime(), startIndex, null);
+            if(addIndex){
+                addMainIndex(task.getId(), task.getExcuteTime(), startIndex, null, partation);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -216,8 +218,6 @@ public class FileUtil {
 
             FileConfig fileConfig = getFileConfig(rf);
 
-            rf.skipBytes(FILE_CONFIG_LENGTH);
-
             byte[] taskBytes = new byte[fileConfig.getTaskMAXLength()];
 
             Task task = null;
@@ -252,6 +252,31 @@ public class FileUtil {
     }
 
     /**
+     * 获取指定任务
+     */
+    public Task getTask(File file, Long startIndex){
+
+        Task task = null;
+        try (RandomAccessFile rf = new RandomAccessFile(file, "r")) {
+
+            FileConfig fileConfig = getFileConfig(rf);
+
+            byte[] taskBytes = new byte[fileConfig.getTaskMAXLength()];
+
+            rf.seek(startIndex);
+
+            rf.read(taskBytes);
+
+            task = JSON.parseObject(taskBytes, Task.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new FileException(TaskExceptionEnum.FILE_TASK_ERROR, e);
+        }
+
+        return task;
+    }
+
+    /**
      * 保存文件头信息
      */
     public void setFileConfig(File file, FileConfig fileConfig) {
@@ -263,7 +288,11 @@ public class FileUtil {
     /**
      * 新增主索引
      */
-    public void addMainIndex(Long id, Date excuteTime, Long fileIndex, MainIndexConfig mainIndexConfig){
+    public void addMainIndex(Long id, Date excuteTime, Long fileIndex, MainIndexConfig mainIndexConfig, Integer partation){
+
+        if(id == null || excuteTime == null || fileIndex == null || mainIndexConfig == null || partation == null){
+            return;
+        }
 
         getFileLock(MAIN_INDEX_FILE.getName());
 
@@ -277,7 +306,7 @@ public class FileUtil {
 
         Long startIndex = MAIN_INDEX_CONFIG_LENGTH + (MAIN_INDEX_LENGTH * (endId - 1));
 
-        MainIndex mainIndex = MainIndex.builder().Id(id).excuteTime(excuteTime).fileIndex(fileIndex).build();
+        MainIndex mainIndex = MainIndex.builder().Id(id).excuteTime(excuteTime).fileIndex(fileIndex).partation(partation).build();
         writeToFile(MAIN_INDEX_FILE, JSON.toJSONBytes(mainIndex), MAIN_INDEX_LENGTH, startIndex);
     }
 
