@@ -2,6 +2,10 @@ package com.mnemosyne.slave;
 
 import com.mnemosyne.common.BizResult;
 import com.mnemosyne.common.Configuration;
+import com.mnemosyne.slave.exception.SlaveException;
+import com.mnemosyne.slave.exception.SlaveExceptionEnum;
+import com.mnemosyne.task.Task;
+import com.mnemosyne.task.TaskHandler;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Consumes;
@@ -11,10 +15,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import com.mnemosyne.slave.exception.SlaveException;
-import com.mnemosyne.slave.exception.SlaveExceptionEnum;
-import com.mnemosyne.task.Task;
-import com.mnemosyne.task.TaskHandler;
 import javax.ws.rs.core.MediaType;
 
 /**

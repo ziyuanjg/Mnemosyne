@@ -84,9 +84,9 @@ public class OkHTTPClient extends BaseClient {
         }
 
         Map<String, Object> bodyMap;
-        if(body instanceof Map){
-            bodyMap = (Map)body;
-        }else {
+        if (body instanceof Map) {
+            bodyMap = (Map) body;
+        } else {
             bodyMap = JSONObject.parseObject(JSON.toJSONString(body));
         }
 
@@ -101,7 +101,7 @@ public class OkHTTPClient extends BaseClient {
         return builder.build();
     }
 
-    private OkHttpClient getHttpClient(){
+    private OkHttpClient getHttpClient() {
 
         return new OkHttpClient.Builder()
                 .readTimeout(10, TimeUnit.SECONDS)

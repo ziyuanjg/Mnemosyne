@@ -29,28 +29,28 @@ public class FileConfig {
     private AtomicInteger finishedTaskNum;
 
 
-    public Boolean isFinish(){
+    public Boolean isFinish() {
 
-        if(taskNum == null || finishedTaskNum == null){
+        if (taskNum == null || finishedTaskNum == null) {
             return Boolean.FALSE;
         }
 
-        if(finishedTaskNum.get() == taskNum.get()){
+        if (finishedTaskNum.get() == taskNum.get()) {
             return Boolean.TRUE;
         }
 
         return Boolean.FALSE;
     }
 
-    public void addTaskNum(){
+    public void addTaskNum() {
         taskNum.incrementAndGet();
     }
 
-    public void addFinishedTaskNum(){
+    public void addFinishedTaskNum() {
         finishedTaskNum.incrementAndGet();
     }
 
-    public Integer getEndTaskId(){
+    public Integer getEndTaskId() {
         return taskNum.get();
     }
 }

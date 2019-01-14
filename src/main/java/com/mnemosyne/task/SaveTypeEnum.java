@@ -5,7 +5,7 @@ import com.mnemosyne.common.EnumInterface;
 /**
  * 持久化方式 Created by Mr.Luo on 2018/4/28
  */
-public enum SaveTypeEnum implements EnumInterface{
+public enum SaveTypeEnum implements EnumInterface {
 
     DISK(1, "DISK"),
     REDIS(2, "REDIS"),

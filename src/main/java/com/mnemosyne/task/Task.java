@@ -88,35 +88,35 @@ public class Task implements Serializable {
     @Default
     private TaskStatusEnum taskStatusEnum = TaskStatusEnum.WAIT_RUN_STATUS;
 
-    public void finish(){
+    public void finish() {
         this.taskStatusEnum = TaskStatusEnum.FINISH_STATUS;
     }
 
-    public void cancel(){
+    public void cancel() {
         this.taskStatusEnum = TaskStatusEnum.CANCEL_STATUS;
     }
 
-    public void pause(){
+    public void pause() {
         this.taskStatusEnum = TaskStatusEnum.PAUSE_STATUS;
     }
 
-    public Boolean isFinish(){
+    public Boolean isFinish() {
         return TaskStatusEnum.FINISH_STATUS.equals(this.taskStatusEnum);
     }
 
-    public Boolean isCancel(){
+    public Boolean isCancel() {
         return TaskStatusEnum.CANCEL_STATUS.equals(this.taskStatusEnum);
     }
 
-    public Boolean isPause(){
+    public Boolean isPause() {
         return TaskStatusEnum.PAUSE_STATUS.equals(this.taskStatusEnum);
     }
 
     public List<Long> getPostpositivelyTaskIdList() {
 
-        if(postpositivelyTaskIdList == null){
-            synchronized (id){
-                if(postpositivelyTaskIdList == null){
+        if (postpositivelyTaskIdList == null) {
+            synchronized (id) {
+                if (postpositivelyTaskIdList == null) {
                     postpositivelyTaskIdList = new ArrayList<>(1);
                 }
             }

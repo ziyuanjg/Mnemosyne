@@ -37,7 +37,7 @@ public class Configuration {
 
     private static AssignHandler assignHandler;
 
-    public Configuration(){
+    public Configuration() {
 
     }
 

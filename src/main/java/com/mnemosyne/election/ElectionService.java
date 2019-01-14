@@ -44,47 +44,38 @@ public class ElectionService {
      * 已校验的节点数
      */
     private final AtomicInteger checkNodeNum = new AtomicInteger(0);
-
-    /**
-     * 选举节点
-     */
-    private ServiceNode electionNode = null;
-
-    /**
-     * 投票节点
-     */
-    private ServiceNode electionMasterNode = null;
-
-    /**
-     * 节点投票信息
-     */
-    private Map<ServiceNode, ServiceNode> electionNodeMap;
-
-    /**
-     * 投票数
-     */
-    private Map<ServiceNode, AtomicInteger> electionNumMap;
-
-    /**
-     * 当前的节点状态
-     */
-    private ElectionStatusEnum electionStatus;
-
-    /**
-     * 投票轮数
-     */
-    private Integer voteNum;
-
     /**
      * 每轮投票秒数
      */
     private final Long voteSecond = 5L * 1000 * 1000000;
-
     /**
      * 拒绝选举结果的节点数
      */
     private final Set<ServiceNode> refuseNodeSet = new HashSet<>();
-
+    /**
+     * 选举节点
+     */
+    private ServiceNode electionNode = null;
+    /**
+     * 投票节点
+     */
+    private ServiceNode electionMasterNode = null;
+    /**
+     * 节点投票信息
+     */
+    private Map<ServiceNode, ServiceNode> electionNodeMap;
+    /**
+     * 投票数
+     */
+    private Map<ServiceNode, AtomicInteger> electionNumMap;
+    /**
+     * 当前的节点状态
+     */
+    private ElectionStatusEnum electionStatus;
+    /**
+     * 投票轮数
+     */
+    private Integer voteNum;
     /**
      * 选举线程
      */
@@ -209,9 +200,10 @@ public class ElectionService {
     private void findResultExecute(ElectionDTO electionDTO, ElectionDTOBuilder builder) {
 
         // 返回本节点是否支持本次选举
-        if(ElectionConfig.getMasterNode().equals(electionDTO.getVoteServiceNode()) && Configuration.getSlaveNodeService().getFailNum() == 0){
+        if (ElectionConfig.getMasterNode().equals(electionDTO.getVoteServiceNode())
+                && Configuration.getSlaveNodeService().getFailNum() == 0) {
             builder.voteElection(Boolean.FALSE);
-        }else{
+        } else {
             builder.voteElection(Boolean.TRUE);
         }
     }
@@ -732,9 +724,9 @@ public class ElectionService {
         public void run() {
 
             // 此时集群中仅有本节点在线,直接当选
-            if(ElectionConfig.getServiceNodeList().size() == 1){
-               ElectionConfig.setMasterNode(ElectionConfig.getLocalNode());
-               Configuration.getMasterNodeService().startHeartThread();
+            if (ElectionConfig.getServiceNodeList().size() == 1) {
+                ElectionConfig.setMasterNode(ElectionConfig.getLocalNode());
+                Configuration.getMasterNodeService().startHeartThread();
             }
 
             log.info("请求发起选举");

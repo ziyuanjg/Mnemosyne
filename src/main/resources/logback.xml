@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true" scanPeriod="60 seconds" debug="false">
+<configuration debug="false" scan="true" scanPeriod="60 seconds">
 
   <!--引入默认配置-->
   <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
@@ -12,7 +12,7 @@
   <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}|{%m} %n"/>
 
   <!-- 项目全量日志，建议每个logger中都加入此appender，用于链路调用跟踪 -->
-  <appender name="STDOUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="STDOUT">
     <file>${LOG_FILE}</file>
     <!-- 循环政策：基于时间创建日志文件 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -29,7 +29,7 @@
   </appender>
 
   <!-- 错误日志 -->
-  <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ERROR_FILE">
     <file>${LOG_PATH}/error.log</file>
     <!-- 循环政策：基于时间创建日志文件 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -51,7 +51,7 @@
   </appender>
 
   <!-- 选举日志 -->
-  <appender name="ELECTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ELECTION_FILE">
     <file>${LOG_PATH}/election.log</file>
     <!-- 循环政策：基于时间创建日志文件 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -73,7 +73,7 @@
   </appender>
 
   <!-- 主节点日志 -->
-  <appender name="MASTER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="MASTER_FILE">
     <file>${LOG_PATH}/master.log</file>
     <!-- 循环政策：基于时间创建日志文件 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -95,7 +95,7 @@
   </appender>
 
   <!-- 子节点日志 -->
-  <appender name="SLAVE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="SLAVE_FILE">
     <file>${LOG_PATH}/slave.log</file>
     <!-- 循环政策：基于时间创建日志文件 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -117,7 +117,7 @@
   </appender>
 
   <!-- 任务日志 -->
-  <appender name="TASK_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="TASK_FILE">
     <file>${LOG_PATH}/task.log</file>
     <!-- 循环政策：基于时间创建日志文件 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -138,32 +138,32 @@
     </encoder>
   </appender>
 
-  <logger name="default" level="INFO" additivity="false">
+  <logger additivity="false" level="INFO" name="default">
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="error" level="ERROR" additivity="false">
+  <logger additivity="false" level="ERROR" name="error">
     <appender-ref ref="ERROR_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="election" level="INFO" additivity="false">
+  <logger additivity="false" level="INFO" name="election">
     <appender-ref ref="ELECTION_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="master" level="INFO" additivity="false">
+  <logger additivity="false" level="INFO" name="master">
     <appender-ref ref="MASTER_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="slave" level="INFO" additivity="false">
+  <logger additivity="false" level="INFO" name="slave">
     <appender-ref ref="SLAVE_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
-  <logger name="task" level="INFO" additivity="false">
+  <logger additivity="false" level="INFO" name="task">
     <appender-ref ref="TASK_FILE"/>
     <appender-ref ref="STDOUT"/>
   </logger>
 
   <root>
-    <level value="INFO" />
-    <appender-ref ref="STDOUT" />
+    <level value="INFO"/>
+    <appender-ref ref="STDOUT"/>
   </root>
 </configuration>

@@ -22,8 +22,7 @@ public enum TaskExceptionEnum implements EnumInterface {
 
 
     PARAM_ERROR_PARTITION(1050, "缺少分区参数"),
-    PARAM_ERROR_DATE(1051, "缺少日期参数")
-    ;
+    PARAM_ERROR_DATE(1051, "缺少日期参数");
 
 
     private Integer code;

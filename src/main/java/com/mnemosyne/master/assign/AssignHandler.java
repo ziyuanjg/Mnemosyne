@@ -9,13 +9,12 @@ import com.mnemosyne.common.httpClient.HTTPClient;
 import com.mnemosyne.common.httpClient.RequestTypeEnum;
 import com.mnemosyne.election.ElectionConfig;
 import com.mnemosyne.election.ServiceNode;
-import com.mnemosyne.task.TaskStatusEnum;
+import com.mnemosyne.task.Task;
+import com.mnemosyne.task.TaskHandler;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import com.mnemosyne.task.Task;
-import com.mnemosyne.task.TaskHandler;
 
 /**
  * Created by Mr.Luo on 2018/5/9
@@ -84,6 +83,10 @@ public class AssignHandler {
         });
     }
 
+    public DateTime getWheelTime() {
+        return WHEEL_TIME;
+    }
+
     private class AssignThread implements Runnable {
 
         @Override
@@ -103,9 +106,5 @@ public class AssignHandler {
                 WHEEL_TIME.setField(DateField.SECOND, WHEEL_TIME.second() + 1);
             }
         }
-    }
-
-    public DateTime getWheelTime() {
-        return WHEEL_TIME;
     }
 }

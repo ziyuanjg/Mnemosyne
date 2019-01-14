@@ -5,15 +5,14 @@ import com.mnemosyne.common.httpClient.HTTPClient;
 import com.mnemosyne.common.httpClient.RequestTypeEnum;
 import com.mnemosyne.election.ElectionConfig;
 import com.mnemosyne.election.ServiceNode;
-import com.mnemosyne.task.TaskStatusEnum;
+import com.mnemosyne.master.MasterConfig;
+import com.mnemosyne.slave.SlaveConfig;
+import com.mnemosyne.task.Task;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.Data;
-import com.mnemosyne.master.MasterConfig;
-import com.mnemosyne.slave.SlaveConfig;
-import com.mnemosyne.task.Task;
 
 /**
  * Created by Mr.Luo on 2018/5/14
@@ -104,8 +103,8 @@ public class AssignTaskThreadPool {
 
     private class AssignTaskThread implements Runnable {
 
-        private LinkedBlockingQueue<Task> assignTaskQueue;
         private final String EXECUTE_BY_TASK_URL = "/salve/executeByTask";
+        private LinkedBlockingQueue<Task> assignTaskQueue;
 
         public AssignTaskThread(LinkedBlockingQueue<Task> assignTaskQueue) {
             this.assignTaskQueue = assignTaskQueue;

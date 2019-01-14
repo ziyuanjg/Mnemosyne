@@ -12,6 +12,7 @@ public class ElectionDTO {
 
     /**
      * 选举状态
+     *
      * @see ElectionStatusEnum
      */
     private Integer status;

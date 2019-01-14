@@ -53,7 +53,7 @@ public abstract class BaseClient implements HTTPClient {
 
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             return "http://" + url;
-        }else{
+        } else {
             return url;
         }
     }

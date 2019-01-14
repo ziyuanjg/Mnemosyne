@@ -1,4 +1,4 @@
-package com.mnemosyne;
+package com.mnemosyne.common;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -8,12 +8,12 @@ import lombok.extern.slf4j.Slf4j;
  * Created by Mr.Luo on 2018/7/8
  */
 @Slf4j
-public class MnemosyneInitListener implements ServletContextListener{
+public class MnemosyneInitListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         log.info("初始化上下文");
-        Mnemosyne mnemosyne = new Mnemosyne();
+        MnemosyneProperties mnemosyne = new MnemosyneProperties();
         mnemosyne.initContext();
         mnemosyne.start();
     }

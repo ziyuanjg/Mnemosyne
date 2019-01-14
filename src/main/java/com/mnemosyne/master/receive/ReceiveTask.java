@@ -7,15 +7,13 @@ import com.mnemosyne.common.httpClient.HTTPClient;
 import com.mnemosyne.common.httpClient.HTTPExceptionEnum;
 import com.mnemosyne.common.httpClient.RequestTypeEnum;
 import com.mnemosyne.election.ElectionConfig;
+import com.mnemosyne.task.Task;
 import com.mnemosyne.task.TaskStatusEnum;
-import com.mnemosyne.task.disk.MainIndexConfig;
-import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import com.mnemosyne.task.Task;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -50,12 +48,13 @@ public class ReceiveTask {
             }
 
             // 添加任务依赖
-            if(task.getWaitTaskId() != null){
+            if (task.getWaitTaskId() != null) {
                 Task waitTask = Configuration.getTaskHandler().getTaskById(task.getWaitTaskId());
-                if(waitTask != null){
+                if (waitTask != null) {
                     waitTask.getPostpositivelyTaskIdList().add(task.getId());
                     ElectionConfig.getServiceNodeList().stream()
-                            .forEach(serviceNode -> Configuration.getReceiveTaskThreadPool().receiveTask(waitTask, serviceNode));
+                            .forEach(serviceNode -> Configuration.getReceiveTaskThreadPool()
+                                    .receiveTask(waitTask, serviceNode));
                 }
             }
         } else {
@@ -85,7 +84,7 @@ public class ReceiveTask {
             Configuration.getAssignTaskThreadPool().assignTask(task);
 
             // TODO 启动后续任务 需过滤执行中和未到时间任务
-            if(CollectionUtil.isEmpty(task.getPostpositivelyTaskIdList())){
+            if (CollectionUtil.isEmpty(task.getPostpositivelyTaskIdList())) {
 
             }
         } else {
@@ -102,17 +101,17 @@ public class ReceiveTask {
     @Path("receveUnfinishedTask")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public BizResult receveUnfinishedTask(List<Long> taskIdList){
+    public BizResult receveUnfinishedTask(List<Long> taskIdList) {
 
-        if(CollectionUtil.isEmpty(taskIdList)){
+        if (CollectionUtil.isEmpty(taskIdList)) {
             return BizResult.createErrorResult(HTTPExceptionEnum.PARAM_ERROR_URL);
         }
 
         taskIdList.forEach(taskId -> {
             Task task = Configuration.getTaskHandler().getTaskById(taskId);
-            if(task != null){
-                if(task.getExcuteTime().getTime() < Configuration.getAssignHandler().getWheelTime().getTime()
-                        && TaskStatusEnum.WAIT_RUN_STATUS.equals(task.getTaskStatusEnum())){
+            if (task != null) {
+                if (task.getExcuteTime().getTime() < Configuration.getAssignHandler().getWheelTime().getTime()
+                        && TaskStatusEnum.WAIT_RUN_STATUS.equals(task.getTaskStatusEnum())) {
                     // 已过执行时间且为待执行状态
                     Configuration.getAssignTaskThreadPool().assignTask(task);
                 }

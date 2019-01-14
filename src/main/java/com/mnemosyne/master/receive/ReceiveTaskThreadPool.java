@@ -4,13 +4,13 @@ import com.mnemosyne.common.Configuration;
 import com.mnemosyne.common.httpClient.HTTPClient;
 import com.mnemosyne.common.httpClient.RequestTypeEnum;
 import com.mnemosyne.election.ServiceNode;
+import com.mnemosyne.master.MasterConfig;
+import com.mnemosyne.slave.SlaveConfig;
+import com.mnemosyne.task.Task;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.Data;
-import com.mnemosyne.master.MasterConfig;
-import com.mnemosyne.slave.SlaveConfig;
-import com.mnemosyne.task.Task;
 
 /**
  * Created by Mr.Luo on 2018/5/11

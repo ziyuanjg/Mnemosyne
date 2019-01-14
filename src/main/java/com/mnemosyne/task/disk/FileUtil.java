@@ -2,16 +2,16 @@ package com.mnemosyne.task.disk;
 
 import cn.hutool.core.date.DateTime;
 import com.alibaba.fastjson.JSON;
+import com.mnemosyne.task.SaveConfig;
+import com.mnemosyne.task.Task;
+import com.mnemosyne.task.exception.FileException;
+import com.mnemosyne.task.exception.TaskExceptionEnum;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import com.mnemosyne.task.SaveConfig;
-import com.mnemosyne.task.Task;
-import com.mnemosyne.task.exception.FileException;
-import com.mnemosyne.task.exception.TaskExceptionEnum;
 
 /**
  * Created by Mr.Luo on 2018/5/16
@@ -49,29 +49,73 @@ public class FileUtil {
     private static final File MAIN_INDEX_FILE = new File(SaveConfig.getFilePath() + "/main_index");
 
 
-    void FileUtil(){
+    FileUtil() {
 
-        if (!MAIN_CONFIG_FILE.getParentFile().exists()) {
-            try {
+        checkAndCreateMainConfigFile();
+
+        checkAndCreateMainIndexFile();
+    }
+
+    /**
+     * 检查并创建主配置文件
+     */
+    private void checkAndCreateMainConfigFile() {
+        try {
+            if (!MAIN_CONFIG_FILE.getParentFile().exists()) {
                 MAIN_CONFIG_FILE.getParentFile().mkdirs();
-                if (!MAIN_CONFIG_FILE.exists()) {
-                    MAIN_CONFIG_FILE.createNewFile();
-                }
-            } catch (Exception e) {
-                throw new FileException(TaskExceptionEnum.FILE_MAINCONFIG_WRITE_ERROR, e);
             }
+
+            if (!MAIN_CONFIG_FILE.exists()) {
+                MAIN_CONFIG_FILE.createNewFile();
+                MainConfig mainConfig = MainConfig.builder()
+                        .taskCount(new AtomicLong(0))
+                        .finishedLastDate(null)
+                        .build();
+                setMainConfig(mainConfig);
+            }
+        } catch (Exception e) {
+            throw new FileException(TaskExceptionEnum.FILE_MAINCONFIG_WRITE_ERROR, e);
+        }
+    }
+
+    /**
+     * 检查并创建主索引文件
+     */
+    private void checkAndCreateMainIndexFile() {
+        try {
+            if (!MAIN_INDEX_FILE.getParentFile().exists()) {
+                MAIN_INDEX_FILE.getParentFile().mkdirs();
+            }
+
+            if (!MAIN_INDEX_FILE.exists()) {
+                MAIN_INDEX_FILE.createNewFile();
+                MainIndexConfig mainIndexConfig = MainIndexConfig.builder()
+                        .endId(new AtomicLong(0))
+                        .taskNum(new AtomicLong(0)).build();
+                setMainIndexConfig(mainIndexConfig);
+            }
+        } catch (Exception e) {
+            throw new FileException(TaskExceptionEnum.FILE_SET_MAIN_INDEX_CONFIG_ERROR, e);
+        }
+    }
+
+    /**
+     * 读取主配置
+     */
+    public MainConfig getMainConfig() {
+
+        try (RandomAccessFile rf = new RandomAccessFile(MAIN_CONFIG_FILE, "rw")) {
+
+            Long length = MAIN_CONFIG_FILE.length();
+            byte[] bytes = new byte[length.intValue()];
+            rf.read(bytes);
+
+            return JSON.parseObject(bytes, MainConfig.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new FileException(TaskExceptionEnum.FILE_MAINCONFIG_READ_ERROR, e);
         }
 
-        if(!MAIN_INDEX_FILE.getParentFile().exists()){
-            try {
-                MAIN_INDEX_FILE.getParentFile().mkdirs();
-                if(!MAIN_INDEX_FILE.exists()){
-                    MAIN_INDEX_FILE.createNewFile();
-                }
-            } catch (IOException e) {
-                throw new FileException(TaskExceptionEnum.FILE_MAINCONFIG_WRITE_ERROR, e);
-            }
-        }
     }
 
     /**
@@ -88,28 +132,6 @@ public class FileUtil {
         } finally {
             releaseFileLock(MAIN_CONFIG_FILE.getName());
         }
-    }
-
-    public MainConfig getMainConfig() {
-
-        if (!MAIN_CONFIG_FILE.exists()) {
-            MainConfig mainConfig = MainConfig.builder().taskCount(new AtomicLong(0)).finishedLastDate(null).build();
-            setMainConfig(mainConfig);
-            return mainConfig;
-        }
-
-        try (RandomAccessFile rf = new RandomAccessFile(MAIN_CONFIG_FILE, "rw")) {
-
-            Long length = MAIN_CONFIG_FILE.length();
-            byte[] bytes = new byte[length.intValue()];
-            rf.read(bytes);
-
-            return JSON.parseObject(bytes, MainConfig.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new FileException(TaskExceptionEnum.FILE_MAINCONFIG_READ_ERROR, e);
-        }
-
     }
 
     /**
@@ -171,7 +193,7 @@ public class FileUtil {
         try {
             getFileLock(file.getName());
             startIndex = writeToFile(file, JSON.toJSONBytes(task), SaveConfig.getTaskMAXLength(), startIndex);
-            if(addIndex){
+            if (addIndex) {
                 addMainIndex(task.getId(), task.getExcuteTime(), startIndex, null, partation);
             }
         } catch (Exception e) {
@@ -254,7 +276,7 @@ public class FileUtil {
     /**
      * 获取指定任务
      */
-    public Task getTask(File file, Long startIndex){
+    public Task getTask(File file, Long startIndex) {
 
         Task task = null;
         try (RandomAccessFile rf = new RandomAccessFile(file, "r")) {
@@ -288,16 +310,17 @@ public class FileUtil {
     /**
      * 新增主索引
      */
-    public void addMainIndex(Long id, Date excuteTime, Long fileIndex, MainIndexConfig mainIndexConfig, Integer partation){
+    public void addMainIndex(Long id, Date excuteTime, Long fileIndex, MainIndexConfig mainIndexConfig,
+            Integer partation) {
 
-        if(id == null || excuteTime == null || fileIndex == null || mainIndexConfig == null || partation == null){
+        if (id == null || excuteTime == null || fileIndex == null || mainIndexConfig == null || partation == null) {
             return;
         }
 
         getFileLock(MAIN_INDEX_FILE.getName());
 
         // 更新主索引配置信息
-        if(mainIndexConfig == null){
+        if (mainIndexConfig == null) {
             mainIndexConfig = getMainIndexConfig();
         }
         Long endId = mainIndexConfig.addTask();
@@ -306,16 +329,17 @@ public class FileUtil {
 
         Long startIndex = MAIN_INDEX_CONFIG_LENGTH + (MAIN_INDEX_LENGTH * (endId - 1));
 
-        MainIndex mainIndex = MainIndex.builder().Id(id).excuteTime(excuteTime).fileIndex(fileIndex).partation(partation).build();
+        MainIndex mainIndex = MainIndex.builder().Id(id).excuteTime(excuteTime).fileIndex(fileIndex)
+                .partation(partation).build();
         writeToFile(MAIN_INDEX_FILE, JSON.toJSONBytes(mainIndex), MAIN_INDEX_LENGTH, startIndex);
     }
 
     /**
      * 根据索引获取任务地址
      */
-    public MainIndex getMainIndex(Long id){
+    public MainIndex getMainIndex(Long id) {
 
-        try(RandomAccessFile rf = new RandomAccessFile(MAIN_INDEX_FILE, "r")) {
+        try (RandomAccessFile rf = new RandomAccessFile(MAIN_INDEX_FILE, "r")) {
 
             byte[] bytes = new byte[MAIN_INDEX_LENGTH];
 
@@ -333,15 +357,12 @@ public class FileUtil {
     /**
      * 获取主索引配置信息
      */
-    public MainIndexConfig getMainIndexConfig(){
+    public MainIndexConfig getMainIndexConfig() {
 
-        try(RandomAccessFile rf = new RandomAccessFile(MAIN_INDEX_FILE, "r")) {
+        try (RandomAccessFile rf = new RandomAccessFile(MAIN_INDEX_FILE, "r")) {
             byte[] bytes = new byte[MAIN_INDEX_CONFIG_LENGTH];
             rf.read(bytes);
             MainIndexConfig mainIndexConfig = JSON.parseObject(bytes, MainIndexConfig.class);
-            if(mainIndexConfig == null){
-                mainIndexConfig = MainIndexConfig.builder().endId(new AtomicLong(0)).taskNum(new AtomicLong(0)).build();
-            }
             return mainIndexConfig;
         } catch (Exception e) {
             e.printStackTrace();
@@ -352,7 +373,7 @@ public class FileUtil {
     /**
      * 更新主索引配置信息
      */
-    public void setMainIndexConfig(MainIndexConfig mainIndexConfig){
+    public void setMainIndexConfig(MainIndexConfig mainIndexConfig) {
 
         try {
             getFileLock(MAIN_INDEX_FILE.getName());
@@ -387,6 +408,8 @@ public class FileUtil {
         try (RandomAccessFile rf = new RandomAccessFile(file, "rw")) {
 
             rf.seek(startIndex);
+
+            rf.write(value);
 
             if (length > value.length) {
                 rf.write(new byte[length - value.length]);

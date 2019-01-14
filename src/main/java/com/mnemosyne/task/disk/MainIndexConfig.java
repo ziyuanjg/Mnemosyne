@@ -1,14 +1,17 @@
 package com.mnemosyne.task.disk;
 
 import java.util.concurrent.atomic.AtomicLong;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Created by Mr.Luo on 2018/7/17
  */
 @Data
 @Builder
+@AllArgsConstructor
 public class MainIndexConfig {
 
     /**
@@ -22,7 +25,7 @@ public class MainIndexConfig {
     private AtomicLong endId;
 
 
-    public Long addTask(){
+    public Long addTask() {
 
         taskNum.incrementAndGet();
 

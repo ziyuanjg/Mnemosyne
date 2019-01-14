@@ -49,24 +49,24 @@ public class ElectionConfig {
         ElectionConfig.masterNode = masterNode;
     }
 
-    public static void addServiceNode(ServiceNode serviceNode){
+    public static void addServiceNode(ServiceNode serviceNode) {
         serviceNodeList.add(serviceNode);
     }
 
-    public static void removeServiceNode(ServiceNode serviceNode){
+    public static void removeServiceNode(ServiceNode serviceNode) {
         serviceNodeList.remove(serviceNode);
     }
 
-    public static ServiceNode getServiceNodeByUrl(String url){
+    public static ServiceNode getServiceNodeByUrl(String url) {
         for (ServiceNode serviceNode : serviceNodeList) {
-            if(serviceNode.getUrl().equals(url)){
+            if (serviceNode.getUrl().equals(url)) {
                 return serviceNode;
             }
         }
         return null;
     }
 
-    public static Boolean removeNode(ServiceNode serviceNode){
+    public static Boolean removeNode(ServiceNode serviceNode) {
         return serviceNodeList.remove(serviceNode);
     }
 }

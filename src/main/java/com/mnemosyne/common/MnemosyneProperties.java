@@ -1,7 +1,6 @@
-package com.mnemosyne;
+package com.mnemosyne.common;
 
 import cn.hutool.setting.dialect.Props;
-import com.mnemosyne.common.Configuration;
 import com.mnemosyne.common.httpClient.OkHTTPClient;
 import com.mnemosyne.common.utils.EnumUtil;
 import com.mnemosyne.common.utils.SystemUtil;
@@ -25,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  * Created by Mr.Luo on 2018/5/22
  */
 @Slf4j
-public class Mnemosyne {
+public class MnemosyneProperties {
 
     /**
      * 读取配置文件

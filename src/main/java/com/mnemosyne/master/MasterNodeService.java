@@ -3,7 +3,7 @@ package com.mnemosyne.master;
 import com.mnemosyne.common.BizResult;
 import com.mnemosyne.election.ElectionConfig;
 import com.mnemosyne.election.ServiceNode;
-import com.mnemosyne.task.disk.MainIndexConfig;
+import com.mnemosyne.slave.SlaveConfig;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,7 +12,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import lombok.extern.slf4j.Slf4j;
-import com.mnemosyne.slave.SlaveConfig;
 
 /**
  * Created by Mr.Luo on 2018/5/23
@@ -25,7 +24,8 @@ public class MasterNodeService {
      * 最近心跳记录
      */
     private final Map<ServiceNode, Long> heartMap = new HashMap<>();
-
+    @Context
+    HttpServletRequest request;
     /**
      * 标志是否为主节点
      */
@@ -36,8 +36,6 @@ public class MasterNodeService {
         startHeartThread();
 
     }
-
-    @Context HttpServletRequest request;
 
     @Path("heart")
     @GET

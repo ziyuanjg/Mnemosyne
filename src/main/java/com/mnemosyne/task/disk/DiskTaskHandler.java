@@ -3,16 +3,16 @@ package com.mnemosyne.task.disk;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import com.mnemosyne.task.AbstractTaskHandler;
 import com.mnemosyne.task.SaveConfig;
 import com.mnemosyne.task.Task;
 import com.mnemosyne.task.exception.FileException;
 import com.mnemosyne.task.exception.TaskExceptionEnum;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -47,7 +47,6 @@ public class DiskTaskHandler extends AbstractTaskHandler {
 
     /**
      * 持久化新增任务
-     * @param task
      */
     private void saveUnfinishedTask(Task task) {
         DateTime excuteTime = DateUtil.date(task.getExcuteTime());
@@ -64,7 +63,7 @@ public class DiskTaskHandler extends AbstractTaskHandler {
 
         } while (file.exists() && file.length() > FILE_MAX_LENGTH);
 
-        fileUtil.SaveTaskToFile(task, file,null, fileNum, Boolean.TRUE);
+        fileUtil.SaveTaskToFile(task, file, null, fileNum, Boolean.TRUE);
 
         FileConfig fileConfig = fileUtil.getFileConfig(file);
         fileConfig.addTaskNum();
@@ -77,7 +76,6 @@ public class DiskTaskHandler extends AbstractTaskHandler {
 
     /**
      * 持久化已完成任务
-     * @param task
      */
     private void saveFinishedTask(Task task) {
 
@@ -99,8 +97,8 @@ public class DiskTaskHandler extends AbstractTaskHandler {
         fileUtil.setFileConfig(file, fileConfig);
 
         // 此分片全部任务都已经执行完毕,刷新主体中的最后全部执行完毕的分片
-        if(fileConfig.getFinishedTaskNum().get() == fileConfig.getTaskNum().get()){
-            if(mainConfig == null || mainConfig.getFinishedAllTaskLastDate().getTime() < excuteTime.getTime()){
+        if (fileConfig.getFinishedTaskNum().get() == fileConfig.getTaskNum().get()) {
+            if (mainConfig == null || mainConfig.getFinishedAllTaskLastDate().getTime() < excuteTime.getTime()) {
                 mainConfig.setFinishedAllTaskLastDate(excuteTime);
             }
         }
@@ -167,7 +165,7 @@ public class DiskTaskHandler extends AbstractTaskHandler {
 
         Date lastRunDate = mainConfig.getFinishedLastDate();
 
-        if(lastRunDate != null && lastRunDate.getTime() >= date.getTime()){
+        if (lastRunDate != null && lastRunDate.getTime() >= date.getTime()) {
             return new ArrayList<Task>(0);
         }
 
@@ -177,22 +175,22 @@ public class DiskTaskHandler extends AbstractTaskHandler {
         do {
 
             File datePath = new File(fileUtil.getFilePath(dateTime));
-            if(datePath.exists() && datePath.isDirectory()){
+            if (datePath.exists() && datePath.isDirectory()) {
                 File[] files = datePath.listFiles();
                 Arrays.stream(files).forEach(file -> {
                     FileConfig fileConfig = fileUtil.getFileConfig(file);
-                    if(fileConfig == null || fileConfig.isFinish()){
+                    if (fileConfig == null || fileConfig.isFinish()) {
                         return;
                     }
 
                     Task task = fileUtil.getTaskFromFile(file);
-                    if(task != null){
+                    if (task != null) {
                         do {
 
-                            if(!task.isFinish()){
+                            if (!task.isFinish()) {
                                 taskList.add(task);
                             }
-                        } while((task = task.getBeforeTask()) != null);
+                        } while ((task = task.getBeforeTask()) != null);
                     }
                 });
             }
@@ -207,7 +205,7 @@ public class DiskTaskHandler extends AbstractTaskHandler {
     protected Task _getTaskById(Long id) {
 
         MainIndex mainIndex = fileUtil.getMainIndex(id);
-        if(mainIndex == null){
+        if (mainIndex == null) {
             return null;
         }
 
@@ -224,13 +222,14 @@ public class DiskTaskHandler extends AbstractTaskHandler {
         return mainIndexConfig.getEndId() + 1;
     }
 
-    public void finishTaskNote(Task task){
+    public void finishTaskNote(Task task) {
 
-        if(mainConfig.getFinishedLastDate() == null || task.getExcuteTime().getTime() > mainConfig.getFinishedLastDate().getTime()){
+        if (mainConfig.getFinishedLastDate() == null || task.getExcuteTime().getTime() > mainConfig
+                .getFinishedLastDate().getTime()) {
             mainConfig.setFinishedLastDate(task.getExcuteTime());
         }
 
-        if(mainConfig.getFinishedTaskCount() == null){
+        if (mainConfig.getFinishedTaskCount() == null) {
             mainConfig.setFinishedTaskCount(new AtomicLong(0));
         }
         mainConfig.getFinishedTaskCount().incrementAndGet();
